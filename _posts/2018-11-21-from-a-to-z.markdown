@@ -1,5 +1,5 @@
 ---
 layout: externalpost
 redirect_url: https://medium.com/@ophirharpaz/from-a-to-w-character-conversion-in-windows-api-9d4bee098d99
-title: From A to W - Character Conversion in Windows API
+title: From A to W — Character Conversion in Windows API
 ---
