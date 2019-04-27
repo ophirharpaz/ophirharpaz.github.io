@@ -16,9 +16,7 @@
 title: Ophir Harpaz
 email: ophirharpaz@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Cyber Security researcher. Junior until further notice.
-  I enjoy learning things and then writing about them to make the process easier for others.
-  Author of begin.re, an x86 reverse-engineering workshop for beginners.
+  Cyber Security researcher
 baseurl: "" # the subpath of your site, e.g. /index
 url: "https://ophirharpaz.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: ophirharpaz
