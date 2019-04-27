@@ -4,7 +4,7 @@ title: About
 permalink: /about/
 ---
 
-I'm a Cyber Security researcher.  
+I'm a Cyber Security researcher working in [Gaurdicore Labs](https://www.guardicore.com/labs/).  
 
 Junior until further notice.  
 
