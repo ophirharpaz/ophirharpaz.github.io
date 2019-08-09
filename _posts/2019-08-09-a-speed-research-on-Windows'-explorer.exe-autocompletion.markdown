@@ -1,24 +1,29 @@
-##Motivation
+## Motivation
+
 It was a couple of days ago at work. I pressed the _Winkey+R_ combination to open the Windows' Run dialog-box and started typing a file-system path to open. While doing so, the application suggested a couple of paths for me to choose from. Among them, I noticed, was a path to a folder I had previously deleted.
 Why is this "widget" suggesting a non-existing path, and how can I delete this path?
 This was the question that triggered my mini-research. 
 
-<Picture>
+This post's goals are to both share my research process & results and introduce the readers to the tools I used. However, 
+I think a good side-effect is to encourage the readers to follow and satisfy their curiosity.
 
-This post's goals are to both share my research process & results and introduce the readers to the tools I used. However, I think a good side-effect is to encourage the readers to follow and satisfy their curiosity.
 
 
-##First Thing - First Aid
+## First Thing - First Aid
 To be honest, when I had the above-mentioned question in mind I had absolutely no idea how to approach it. The run dialog-box was some magical popup that I knew only as an end-user. I just didn't know where to start. 
 Luckily, Daniel my team-leader is a Windows robotrick - given a question, 95% chance he has an answer. Otherwise, he just knows how obtain one.
 I simply asked him "What would you do if you wanted to know how the Run dialog-box autocompletes your typed strings?". In response, he gave me a short intro to Windows' windows (ha), showed me some tools and set me off.
 
-##The Research Process
+
+
+## The Research Process
 
 In hindsight, I can divide the process into 3 stages:
 1. **Identify the process** which is responsible for the Run dialog-box;
 2. **Trace the autocomplete-related actions** performed by this process;
 3. **Get to a conclusion**.
+
+
 
 ###1. Identifying the Run dialog-box's Process
  
@@ -31,6 +36,8 @@ Another tool named _Spy++_ comes bundled with Microsoft Visual Studio. Compared 
 
 <gif showing how I got the process ID from Spy++>
 
+
+
 ###2. Tracing explorer.exe's Events (...that are relevant to the autocomplete feature)
 
 The classical tool for tracing the events of a process is, for me, _Process Monitor_. Once I knew to concentrate on explorer.exe's, I looked at the events this process created in _Process Monitor_. The problem is, explorer.exe creates shit-tons of events, all the time, non-stop. I went back to _Spy++_ looking for more information on the _Run_ window, and saw its thread ID (TID). Having this datum, the task of filtering out irrelevent explorer.exe events turned much easier.
@@ -40,6 +47,8 @@ The classical tool for tracing the events of a process is, for me, _Process Moni
 At this point I had much fewer events to look at, or in other words, much less text to pop into my sight. It was then when I saw a registry-write event* referring to a key named _**RunMRU**_. Seeing the word "Run", and recalling that _MRU_ stands for "most-recently used", I figured this might be the place I searched for. 
 
 *_RegSetValue_ is the Windows API function for writing data to the registry. 
+
+
 
 ###3. Reaching Conclusions
 
@@ -53,6 +62,8 @@ Nevertheless, there was still something unclear. I noticed two autocomplete scen
 2. _Run_ suggests **existing paths** that I **never-in-my-life typed** - still needed a clarification.
 
 TODO Show the autocomplete COM object referral.
+
+
 
 ##Summing Up
 
