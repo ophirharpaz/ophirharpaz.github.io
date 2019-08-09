@@ -7,8 +7,8 @@ This was the question that triggered my mini-research.
 
 This post's goals are to both share my research process & results and introduce the readers to the tools I used. However, I think a good side-effect is to encourage the readers to follow and satisfy their curiosity.
 
-## First Thing - First Aid
 
+## First Thing - First Aid
 To be honest, when I had the above-mentioned question in mind I had absolutely no idea how to approach it. The run dialog-box was some magical popup that I knew only as an end-user. I just didn't know where to start. 
 Luckily, Daniel my team-leader is a Windows robotrick - given a question, 95% chance he has an answer. Otherwise, he just knows how obtain one.
 I simply asked him "What would you do if you wanted to know how the Run dialog-box autocompletes your typed strings?". In response, he gave me a short intro to Windows' windows (ha), showed me some tools and set me off.
