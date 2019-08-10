@@ -4,7 +4,7 @@ title:  "A Speed-Research on Windows Explorer's Auto-Completion"
 ---
 
 ### Motivation
-It was a couple of days ago at work. I pressed the _Winkey+R_ combination to open the Windows' _Run_ dialog-box and 
+It was a couple of days ago at work. I pressed the keyboard shortcut _Winkey+R_ to open Windows' _Run_ dialog-box and 
 started typing a file-system path to open. While doing so, the application suggested a couple of paths for me to choose 
 from. 
 
@@ -19,28 +19,29 @@ This was the question that triggered my research, whose process and findings I w
 ### First Thing - First Aid
 Having the above-mentioned question in mind, I didn't know where to start. 
 The run dialog-box was some magical popup that I knew only as an end-user. I had absolutely no idea how to approach this problem.
-Luckily, [Daniel](https://twitter.com/ace__pace) my team-leader is a Windows robotrick; 
-he has the answer (or the path to it) to any Windows question. 
+Luckily, [Daniel](https://twitter.com/ace__pace) my team-leader has the answer (or the path to it) to any Windows question.
+
 I simply asked him: "What would you do if you wanted to know how the Run dialog-box auto-completes your typed strings?". 
-In response, he gave me a short intro to Windows' windows (:neutral_face:), showed me some tools and set me off.
+In response, he gave me a short intro to Windows' windows (:neutral_face:), taught me how to locate a UI window using 
+_Spy++_ and set me off.
 
 ### The Research Process
 In hindsight, I can divide the process into 3 stages:
 1. **Identify the process** which is responsible for the _Run_ dialog-box;
-2. **Trace the autocomplete-related actions** performed by this process;
+2. **Find the autocomplete-related events** performed by this process;
 3. **Get to a conclusion**.
 
 # 1. Identifying the Run dialog-box's Process 
-As a user, the Run dialog-box was for me a UI window. As a researcher, I needed to think of it as a process. 
-[Sysinternals suite's](https://docs.microsoft.com/en-us/sysinternals/downloads/sysinternals-suite) has (at least) two 
-tools to help with window-to-process mapping: _Process Explorer_ and _Process Monitor_. Both have a nice feature that 
-lets you point at a UI window object and get the process which created it.
+In order to understand where _Run_ stored its saved paths, I needed to first find the process responsible for its dialog-box. 
+Both _Process Explorer_ and _Process Monitor_ from [Sysinternals suite's](https://docs.microsoft.com/en-us/sysinternals/downloads/sysinternals-suite) 
+help with window-to-process mapping; they have a nice feature that lets you point at a UI window object and get the 
+process which created it.
 
-![Process Explorer enables to locate a window's process by hovering over it with a designated cursor](/images/procexp_cursor.gif "Process Explorer Find Window's Process")
+![Process Explorer enables to locate a window's process by hovering over it with a designated cursor](/images/procexp_cursor.png "Process Explorer Find Window's Process")
 
 Another tool named [_Spy++_](https://docs.microsoft.com/en-us/visualstudio/debugger/introducing-spy-increment?view=vs-2019) 
 comes bundled with Microsoft Visual Studio. Compared to _Process Monitor_ and _Process Explorer_, _Spy++_ is much more 
-windows-oriented and displays the complete windows hierarchy of the current session. 
+window-oriented and displays the complete window hierarchy of the current session. 
 I decided to go with _Spy++_ as it was both new to me and it felt more accurate for the mission.
 
 Using _Spy++_ I identified the _Run_ dialog-box's process. It turned out that this window is named _Run_ and belongs to 
@@ -54,17 +55,14 @@ Once I knew I should concentrate on _explorer.exe_, I looked at its events in _P
 The problem is, _explorer.exe_ creates shit-tons of events, all the time, non-stop. 
 
 I went back to _Spy++_ looking for more information on the _Run_ window, and noticed its thread ID (TID). 
-Having this datum, the task of filtering out irrelevant _explorer.exe_ events turned much easier.
+With this information, the task of filtering out irrelevant _explorer.exe_ events turned much easier.
 
-At this point I had much fewer events to look at, or in other words, much less text to pop into my sight. 
-It was then when I saw a registry-write event* referring to a key named _**RunMRU**_. 
-Seeing the word "Run", and recalling that _MRU_ stands for "most recently used", I figured this might be the place 
-I searched for.
+Even after filtering, there were still many events. Briefly scanning them, I saw a registry-write event referring to a 
+key named _**RunMRU**_. Seeing the word "Run", and recalling that _MRU_ stands for "most recently used", I figured this 
+might be the place I was searching for.
 
 ![Process Monitor shows registry-write events, accessing a key named RunMRU](/images/mru_in_procmon.png "Registry Writes to MRU Keys")
 
-
-> *_RegSetValue_ is the Windows API function for writing data to the registry. 
 
 # 3. Reaching Conclusions
 I went straight to the registry path `HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU\MRUList` where I 
@@ -80,6 +78,13 @@ Woohooooooooo!
 I tested this by evicting the non-existent path from the MRU list (by simply typing in new paths). Once the registry 
 entry was "out" - the path never appeared again in the drop down list.
 
+Actually, the MRU mechanism is pretty sweet so I'll elaborate a bit. 
+_explorer.exe_ saves at each given moment 26 paths. 
+Each path is saved in a key whose name is a letter from _a_ to _z_. 
+The "most" part in the "MRU" is encoded in the _MRUList_ key. This is a string consisting of all 26 alphabet letters,
+the first letter being the newest entry and the last one being the oldest. This string determines the order of the
+paths appearing when you hit the down-arrow multiple times while in the _Run_ dialog-box. 
+
 # 4. One Last Investigation
 There was still something unclear. I noticed two "autocomplete scenarios":
 1. _Run_ suggests **non-existing paths** that I **onced typed** - explained by the MRU list;
@@ -90,9 +95,10 @@ The second scenario was still an open question to me.
 TODO Show the autocomplete COM object referral.
 
 ### Summing Up
-This short blog post shows how I did a quick research on some mechanism in Windows that I found interesting. I found out that file-paths autocompletion is done based on:
-- real-time traversal of the file system;
-- a list of most-recently used file paths.
+This short blog post shows how I did a quick research on a mechanism in Windows that I found interesting. 
+I found out that file-paths auto-completion is done based on:
+- a list of most-recently used file paths;
+- real-time traversal of the file system.
 
 I believe these questions, that arise from one's curiosity, are the ones that are most satisfying to answer :)
 I hope you always stay curious enough to ask questions and restless enough to answer them. 
