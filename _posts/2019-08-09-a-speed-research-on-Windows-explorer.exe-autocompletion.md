@@ -80,31 +80,27 @@ the non-existent path was pushed out. Once the path was no longer in the registr
 drop down list.
 
 
-Actually, the MRU mechanism is pretty sweet so I'll elaborate a bit in the box below.
-```
-explorer.exe saves 26 paths at each given moment. 
-Why 26? Because each path is saved in a key whose name is a letter from a to z. 
-The "most" part in the "MRU" is encoded in the MRUList key. 
-This is a string consisting of all 26 alphabet letters, 
-the first letter being the newest entry, the last letter being the oldest. 
-This string determines the order of the paths that appear when you hit the down-arrow 
-in the Run dialog-box. 
-```
+Actually, the MRU mechanism is pretty sweet so I'll elaborate a bit.
 
-# 4. One Last Investigation
-Even with the MRU, there was still something unclear. I noticed two "autocomplete scenarios":
+_explorer.exe_ saves 26 paths at each given moment. Why 26? Because each path is saved in a key whose name is a letter 
+between a and z. The "most" part in the "MRU" is encoded in the _MRUList_ key. This is a string consisting of all 26 
+alphabet letters, the first letter being the newest entry and the last letter being the oldest. 
+This string determines the order of the paths that appear when you hit the down-arrow in the Run dialog-box. 
+
+# 4. A Follow-Up Question
+
+I noticed two scenarios:
 1. _Run_ suggests **non-existing paths** that I **once typed**;
 2. _Run_ suggests **existing paths** that I **never-in-my-life typed**.
 
-The first scenario was explained by the MRU list, but the second still needed clarification.
+The first scenario can be explained by the MRU list, but the second still needs clarification. My assumption is that
+_explorer.exe_ traverses the file-system in real time, and is therefore capable of suggesting paths that were never typed-in. 
+However, I'll leave it for (someone's, maybe my) further work.
 
-TODO Show the autocomplete COM object referral.
 
 ### Summing Up
-This short blog post shows how I did a quick research on a mechanism in Windows that I found interesting. 
-I found out that file-paths auto-completion is done based on:
-- a list of most-recently used file paths;
-- real-time traversal of the file system.
+This short blog post shows how I did a quick research on a mechanism in Windows that I thought was interesting. 
+I found out that _Run_ dialog-box auto-completes file-paths based on a list of 26 most-recently-used paths in the registry. 
 
 I believe these questions, that arise from one's curiosity, are the ones that are most satisfying to answer :)
 I hope you always stay curious enough to ask questions and restless enough to answer them. 
