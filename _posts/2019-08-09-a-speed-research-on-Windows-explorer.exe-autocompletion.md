@@ -1,7 +1,11 @@
 ---
 layout: post
 title:  "A Speed-Research on Windows Explorer's Auto-Completion"
+image: https://ophirharpaz.github.io/images/2019_08_09_run_dialog_box.png
+vertical: Code
+excerpt: "A short walk-through of my research on how explorer.exe auto-completes file-paths"
 ---
+
 
 It was a couple of days ago at work. I pressed the keyboard shortcut _Winkey+R_ to open Windows' _Run_ dialog-box and 
 started typing a file-system path to open. While doing so, the application suggested a couple of paths for me to choose 
