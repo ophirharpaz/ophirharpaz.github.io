@@ -27,7 +27,7 @@ this section will definitely suffice.
 ![SSH Local Port Forwarding in a Diagram](/images/ssh_port_forwarding.png "SSH Local Port Forwarding in a Diagram")
 
 1. The client creates a **socket** and binds it to *localaddr* and *localport* (actually, it binds a socket for each 
-address resolved from **localaddr**, but let's keep things simple). 
+address resolved from *localaddr*, but let's keep things simple). 
 If no *localaddr* is specified (which is usually the case for me), the client will create a socket for *localhost*. 
 `listen()` is called on the created, bound socket.
 2. Once a connection is accepted on the socket, the client creates a **channel** with the socket's file descriptor 
