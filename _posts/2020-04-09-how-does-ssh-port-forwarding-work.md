@@ -387,7 +387,7 @@ On the client side, the channel is reading/writing from/to the socket connected 
 On the server side, the channel reads/writes against the remote address socket.**
 
 
-## Epilog
+## Epilogue
 
 This type of write-up is pretty difficult to write, and even more so to read. So I'm glad you survived. 
 
