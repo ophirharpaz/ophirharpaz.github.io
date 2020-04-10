@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <title>Using Peewee&#39;s Expression to Perform Array Operations // Ophir&#39;s Tech-Blogging Drawer</title>
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.69.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Ophir Harpaz" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="https://ophirharpaz.github.io/css/main.min.ae2c98d0a99ba1fcfa761cdd94c664d871f397fdc15abbe8c66dc5fb512ebe27.css" />
+    <link rel="icon" type="image/png" href="favicon.png">
+
+    
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Using Peewee&#39;s Expression to Perform Array Operations"/>
+<meta name="twitter:description" content="This is a story about problem solving. True, it involves Python and database code, but eventually what I&rsquo;m describing is running into a problem, understanding its root cause and finding a creative way to solve it.
+To understand this blog post, all you need to know is some SQL. I&rsquo;ll try to take care of the rest.
+Entities &amp; Schema For the sake of simplicity, we&rsquo;ll be talking about Books and Authors."/>
+
+    <meta property="og:title" content="Using Peewee&#39;s Expression to Perform Array Operations" />
+<meta property="og:description" content="This is a story about problem solving. True, it involves Python and database code, but eventually what I&rsquo;m describing is running into a problem, understanding its root cause and finding a creative way to solve it.
+To understand this blog post, all you need to know is some SQL. I&rsquo;ll try to take care of the rest.
+Entities &amp; Schema For the sake of simplicity, we&rsquo;ll be talking about Books and Authors." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ophirharpaz.github.io/posts/peewee/" />
+<meta property="article:published_time" content="2019-12-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-12-27T00:00:00+00:00" />
+
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="https://ophirharpaz.github.io/"><img class="app-header-avatar" src="/avatar.jpg" alt="Ophir Harpaz" /></a>
+      <h1>Ophir&#39;s Tech-Blogging Drawer</h1>
+      <p>My tech-blogging drawer is where I put everything I write on tech and security.</p>
+      <div class="app-header-social">
+        
+      </div>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">Using Peewee&#39;s Expression to Perform Array Operations</h1>
+      <div class="post-meta">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          Dec 27, 2019
+        </div>
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          6 min read
+        </div></div>
+    </header>
+    <div class="post-content">
+      <p>This is a story about problem solving. True, it involves Python and database code, but eventually what I&rsquo;m describing
+is running into a problem, understanding its root cause and finding a creative way to solve it.</p>
+<p>To understand this blog post, all you need to know is some SQL. I&rsquo;ll try to take care of the rest.</p>
+<h3 id="entities--schema">Entities &amp; Schema</h3>
+<p>For the sake of simplicity, we&rsquo;ll be talking about <em>Books</em> and <em>Authors</em>.
+The relation between them is <em>many-to-many</em>: a book may have more than one author, and an author can write more than
+one book.</p>
+<p>The data is stored in a <a href="https://www.postgresql.org/">PostgreSQL</a> database in 3 tables: <em>Book</em>, <em>Author</em>, and
+<em>BookToAuthor</em>. Each entity (book and author) has an ID, and the last table simply maps between these IDs.</p>
+<table>
+<thead>
+<tr>
+<th align="center">book_id</th>
+<th align="center">author_id</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">1</td>
+<td align="center">3</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center">9</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="center">6</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="center">9</td>
+</tr>
+</tbody>
+</table>
+<p>The database code is written in <a href="http://docs.peewee-orm.com/en/latest/">Peewee</a>.
+Peewee is an ORM library in Python, which means it converts data from certain SQL databases (PostgreSQL is among them)
+to Python objects and vice versa.
+When you query the database, you do it by writing object-oriented code instead of raw SQL statements.</p>
+<h3 id="the-task">The Task</h3>
+<p>The task I had to perform was simple: <strong>find all books that were written by a specific list of authors</strong>,
+e.g. find all books whose authors are Jane Austen, J.K. Rowling and Harper Lee (all three!).</p>
+<p>To do that, I performed a two-level query:</p>
+<ol>
+<li>First, for each book ID, aggregate all its author IDs into an array (as seen in the table below).</li>
+<li>Then, return only the books whose aggregated array equals the given array.</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="center">book_id</th>
+<th align="center">author_ids</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">1</td>
+<td align="center">[3]</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center">[9]</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="center">[6, 9]</td>
+</tr>
+</tbody>
+</table>
+<p>This was my code for the first step:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># First-Level Query</span>
+subquery <span style="color:#f92672">=</span> BookToAuthor<span style="color:#f92672">.</span>select(
+    BookToAuthor<span style="color:#f92672">.</span>book_id,
+    fn<span style="color:#f92672">.</span>ARRAY_AGG(Book<span style="color:#f92672">.</span>author_id<span style="color:#f92672">.</span>distinct())<span style="color:#f92672">.</span>alias(<span style="color:#e6db74">&#39;author_ids&#39;</span>))<span style="color:#f92672">.</span>group_by(Book<span style="color:#f92672">.</span>book_id)
+
+</code></pre></div><p>In SQL, this translates into:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> book_id, 
+       ARRAY_AGG(<span style="color:#66d9ef">DISTINCT</span> author_id) <span style="color:#66d9ef">AS</span> author_ids
+<span style="color:#66d9ef">FROM</span> BookToAuthor
+</code></pre></div><p>This would return an aggregated array of author IDs per book.</p>
+<p>Now the code for the whole process. Before reading it, notice that:</p>
+<ul>
+<li>The <code>certain_authors</code> variable is a list of the author IDs I&rsquo;m interested in, say [6, 9].</li>
+<li>The <code>.c</code> operator is Peewee&rsquo;s <a href="http://docs.peewee-orm.com/en/latest/peewee/query_builder.html#select-queries">way</a>
+of accessing a subquery result&rsquo;s column.</li>
+<li><code>contains</code> is a Peewee <a href="http://docs.peewee-orm.com/en/latest/peewee/playhouse.html#ArrayField.contains">method</a>
+that enables to test if a database array contains the given elements.</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># First-Level Query</span>
+subquery <span style="color:#f92672">=</span> BookToAuthor<span style="color:#f92672">.</span>select(
+    BookToAuthor<span style="color:#f92672">.</span>book_id,
+    fn<span style="color:#f92672">.</span>ARRAY_AGG(Book<span style="color:#f92672">.</span>author_id<span style="color:#f92672">.</span>distinct())<span style="color:#f92672">.</span>alias(<span style="color:#e6db74">&#39;author_ids&#39;</span>))<span style="color:#f92672">.</span>group_by(Book<span style="color:#f92672">.</span>book_id)
+
+<span style="color:#75715e"># Second-Level Query</span>
+results <span style="color:#f92672">=</span> BookToAuthor<span style="color:#f92672">.</span>select(
+    BookToAuthor<span style="color:#f92672">.</span>book_id)<span style="color:#f92672">.</span>join(
+    <span style="color:#75715e"># Join with subquery on the book_id column</span>
+    subquery, on<span style="color:#f92672">=</span>(subquery<span style="color:#f92672">.</span>book_id <span style="color:#f92672">==</span> BookToAuthor<span style="color:#f92672">.</span>book_id))<span style="color:#f92672">.</span>where(
+    <span style="color:#75715e"># Choose only book IDs whose authors are (certain_authors)</span>
+    subquery<span style="color:#f92672">.</span>c<span style="color:#f92672">.</span>author_ids<span style="color:#f92672">.</span>contains(certain_authors))
+</code></pre></div><p>Whoopie doo. This looked good to me.</p>
+<h3 id="it-wasnt-or-the-problem">It wasn&rsquo;t. or: The Problem</h3>
+<p>The problem was I didn&rsquo;t get any results; I got an error.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">ProgrammingError: operator does <span style="color:#f92672">not</span> exist: integer[] <span style="color:#f92672">~~*</span> unknown
+LINE <span style="color:#ae81ff">1</span>: <span style="color:#f92672">...=</span> <span style="color:#e6db74">&#34;t1&#34;</span><span style="color:#f92672">.</span><span style="color:#e6db74">&#34;book_id&#34;</span>) WHERE (<span style="color:#e6db74">&#34;t2&#34;</span><span style="color:#f92672">.</span><span style="color:#e6db74">&#34;author_ids&#34;</span> ILIKE <span style="color:#e6db74">&#39;%[1...</span>
+                                                             <span style="color:#f92672">^</span>
+HINT:  No operator matches the given name <span style="color:#f92672">and</span> argument types<span style="color:#f92672">.</span> You might need to add explicit type casts<span style="color:#f92672">.</span>
+</code></pre></div><p><strong>Peewee was using <code>ILIKE</code> <em>string</em> operator. It was not treating <code>author_ids</code> as an array</strong>.</p>
+<p>Using Peewee&rsquo;s <code>.sql()</code> method, I could confirm this by seeing the full query to which my code was translated:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> t1.book_id 
+<span style="color:#66d9ef">FROM</span> BookToAuthor <span style="color:#66d9ef">AS</span> t1
+<span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> (<span style="color:#66d9ef">SELECT</span> t1.book_id, 
+                   ARRAY_AGG(<span style="color:#66d9ef">DISTINCT</span> x.author_id) <span style="color:#66d9ef">AS</span> author_ids 
+            <span style="color:#66d9ef">FROM</span> BookToAuthor <span style="color:#66d9ef">AS</span> t1 
+            <span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> t1.book_id) <span style="color:#66d9ef">AS</span> t2 
+      <span style="color:#66d9ef">ON</span> (t2.book_id <span style="color:#f92672">=</span> t1.book_id) 
+<span style="color:#66d9ef">WHERE</span> t2.author_ids <span style="color:#66d9ef">ILIKE</span> <span style="color:#e6db74">&#39;%&lt;certain_authors&gt;%&#39;</span>
+</code></pre></div><p>It was time to see why Peewee chose a string operator - a case-insensitive string match - instead of array-contains.</p>
+<h3 id="debugging">Debugging</h3>
+<p>With Pycharm I did a lot of F7 and F8 to step into and over the code.
+Eventually I broke on the following method inside the <code>ColumnBase</code> class:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">contains</span>(self, rhs):
+    <span style="color:#66d9ef">return</span> Expression(self, <span style="color:#e6db74">&#39;ILIKE&#39;</span>, <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">%%%s%%</span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">%</span> rhs)
+</code></pre></div><p>Peewee reached a place I didn&rsquo;t want it to reach - a class for generic column types. In this class, the method
+<code>contains</code> treats its operands as strings.</p>
+<p>However, Peewee has a more specific class
+named <code>ArrayField</code>. There, there&rsquo;s a different implementation for the method <code>contains</code> which is mapped onto a different
+SQL operator:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">contains</span>(self, <span style="color:#f92672">*</span>items):
+    <span style="color:#66d9ef">return</span> Expression(self, <span style="color:#e6db74">&#39;@&gt;&#39;</span>, ArrayValue(self, items))
+</code></pre></div><p>This was exactly what I needed - the <code>@&gt;</code> operator which checks if an array contains one or more of another array&rsquo;s
+elements. But Peewee never got there :(</p>
+<p>I needed to find a way to override this behavior and tell Peewee that the two operands are arrays, and that <code>contains</code>
+should be translated into <code>@&gt;</code> and not into <code>ILIKE</code><!-- raw HTML omitted -->1<!-- raw HTML omitted -->.</p>
+<h3 id="using-peewees-_expression_">Using Peewee&rsquo;s <em>Expression</em></h3>
+<p>Peewee allows adding custom expressions. An expression consists of a left-hand and right-hand side operands and an
+operator.</p>
+<p>For example, the last <code>contain</code> method called an expression which used <code>ArrayField</code> values as both operands, and
+the operator <code>@&gt;</code>.</p>
+<p>And so I added my new, custom expression inside a function:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">array_equals</span>(lhs, rhs):
+    <span style="color:#66d9ef">return</span> Expression(lhs, <span style="color:#e6db74">&#39;@&gt;&#39;</span>, rhs)
+</code></pre></div><p>Good! My new query looked like this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># First-Level Query (same as before)</span>
+subquery <span style="color:#f92672">=</span> BookToAuthor<span style="color:#f92672">.</span>select(
+    BookToAuthor<span style="color:#f92672">.</span>book_id,
+    fn<span style="color:#f92672">.</span>ARRAY_AGG(Book<span style="color:#f92672">.</span>author_id<span style="color:#f92672">.</span>distinct())<span style="color:#f92672">.</span>alias(<span style="color:#e6db74">&#39;author_ids&#39;</span>))<span style="color:#f92672">.</span>group_by(Book<span style="color:#f92672">.</span>book_id)
+
+<span style="color:#75715e"># Second-Level Query</span>
+results <span style="color:#f92672">=</span> BookToAuthor<span style="color:#f92672">.</span>select(
+    BookToAuthor<span style="color:#f92672">.</span>book_id)<span style="color:#f92672">.</span>join(
+    subquery, on<span style="color:#f92672">=</span>(subquery<span style="color:#f92672">.</span>book_id <span style="color:#f92672">==</span> BookToAuthor<span style="color:#f92672">.</span>book_id))<span style="color:#f92672">.</span>where(
+    <span style="color:#75715e"># Only this line changed:</span>
+    array_equals(subquery<span style="color:#f92672">.</span>c<span style="color:#f92672">.</span>author_ids, certain_authors))
+</code></pre></div><p>I happily ran the query and&hellip; meh. An error again:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">ProgrammingError: operator does <span style="color:#f92672">not</span> exist: integer[] <span style="color:#960050;background-color:#1e0010">@</span><span style="color:#f92672">&gt;</span> record
+LINE <span style="color:#ae81ff">1</span>: <span style="color:#f92672">...=</span> <span style="color:#e6db74">&#34;t1&#34;</span><span style="color:#f92672">.</span><span style="color:#e6db74">&#34;book_id&#34;</span>) WHERE (<span style="color:#e6db74">&#34;t2&#34;</span><span style="color:#f92672">.</span><span style="color:#e6db74">&#34;author_ids&#34;</span> <span style="color:#960050;background-color:#1e0010">@</span><span style="color:#f92672">&gt;</span> (<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>))
+                                                             <span style="color:#f92672">^</span>
+HINT:  No operator matches the given name <span style="color:#f92672">and</span> argument types<span style="color:#f92672">.</span> You might need to add explicit type casts
+</code></pre></div><p>Look at the query though - the operator changed! Peewee was now building my query with the array-contains operator <code>@&gt;</code>,
+which was a huge step in the process of solving this issue.</p>
+<p>However, as the error indicated - something remained incorrect with the arguments&rsquo; types. Since the <code>author_ids</code>
+operand was seen as an integer array (see the first line in the error message), it must have been the right-hand side
+operand - the list literal - that was incorrectly parsed.</p>
+<h3 id="one-last-trick">One Last Trick</h3>
+<p>Looking at the examples in the <a href="https://www.postgresql.org/docs/9.1/functions-array.html">PostgreSQL documentation</a>, I saw
+that array operations were done with explicit type declaration - arrays are preceded with the keyword <code>ARRAY</code>.</p>
+<p>Completely impatient but with a strong feeling of almost-victory, I replaced the python variable with a pure SQL
+expression:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># Only the relevant line-of-code from before...</span>
+array_equals(subquery<span style="color:#f92672">.</span>c<span style="color:#f92672">.</span>author_ids, SQL(<span style="color:#e6db74">&#39;ARRAY{}&#39;</span><span style="color:#f92672">.</span>format(certain_authors)))
+</code></pre></div><p>This was a hacky solution, but it produced my oh-so-desired SQL query:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> t1.book_id 
+<span style="color:#66d9ef">FROM</span> BookToAuthor <span style="color:#66d9ef">AS</span> t1 
+<span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> (<span style="color:#66d9ef">SELECT</span> t1.book_id, 
+                   ARRAY_AGG(<span style="color:#66d9ef">DISTINCT</span> t1.author_id) <span style="color:#66d9ef">AS</span> author_ids 
+                   <span style="color:#66d9ef">FROM</span> BookToAuthor <span style="color:#66d9ef">AS</span> t1 
+                   <span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> t1.book_id) <span style="color:#66d9ef">AS</span> t2 
+      <span style="color:#66d9ef">ON</span> (t2.book_id <span style="color:#f92672">=</span> t1.book_id)
+<span style="color:#66d9ef">WHERE</span> (t2.author_ids <span style="color:#f92672">@&gt;</span> ARRAY[<span style="color:#ae81ff">6</span>, <span style="color:#ae81ff">9</span>])<span style="color:#e6db74">&#39;
+</span></code></pre></div><p>My almost-victory was now a victory.</p>
+<h3 id="lessons-learned">Lessons Learned</h3>
+<p>This extremely-specific scenario had important takeaways for me to recall in the future:</p>
+<ol>
+<li>Don&rsquo;t be afraid to debug library code. We often use it as a black box, but in cases like mine it was important
+to dig in and confirm where the problem lay.</li>
+<li>The idea of using <code>Expressions</code> was my colleague&rsquo;s - Tal Shahnovsky.
+When things don&rsquo;t work, I personally tend to get frustrated and think &ldquo;Nothing will ever solve this&rdquo;.
+Someone else&rsquo;s clear mind may bring some good ideas into the process, give them a chance.</li>
+<li>A better knowledge of Peewee would have helped me in coming up with <code>Expression</code> as a solution. If you&rsquo;re working with
+a library and having trouble - invest some time in getting to know the module and its capabilities better.
+This may pay off.</li>
+</ol>
+<p>If any of you have an idea of how to solve this problem better, more elegantly or just differently,
+I&rsquo;ll be pleased to hear from you.
+Do not hesitate to contact.</p>
+<!-- raw HTML omitted -->
+<hr>
+<p><!-- raw HTML omitted -->1<!-- raw HTML omitted -->You may think to yourself: &ldquo;Why not just execute a raw SQL query?&quot;. mat
+Peewee indeed has this functionality - build a query using a string and execute it with <code>execute_sql</code>.
+However, the resulting rows are returned as tuples and not as objects, which would make my code ugly AF.
+But this was what I intended to do as a last resort.</p>
+
+    </div>
+    <div class="post-footer">
+      
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>

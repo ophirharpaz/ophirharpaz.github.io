@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <title>How Does SSH Port Forwarding Work? // Ophir&#39;s Tech-Blogging Drawer</title>
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.69.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Ophir Harpaz" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="https://ophirharpaz.github.io/css/main.min.ae2c98d0a99ba1fcfa761cdd94c664d871f397fdc15abbe8c66dc5fb512ebe27.css" />
+    <link rel="icon" type="image/png" href="favicon.png">
+
+    
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="How Does SSH Port Forwarding Work?"/>
+<meta name="twitter:description" content="I often use the command ssh server_addr -L localport:remoteaddr:remoteport to create an SSH tunnel. This allows me, for example, to communicate with a host that is only accessible to the SSH server. You can read more about SSH port forwarding (also known as &ldquo;tunneling&rdquo;) here. This blog post assumes this knowledge.
+But what happens behind the scenes when the above-mentioned command is executed? What happens in the SSH client and server when they respond to this port forwarding instruction?"/>
+
+    <meta property="og:title" content="How Does SSH Port Forwarding Work?" />
+<meta property="og:description" content="I often use the command ssh server_addr -L localport:remoteaddr:remoteport to create an SSH tunnel. This allows me, for example, to communicate with a host that is only accessible to the SSH server. You can read more about SSH port forwarding (also known as &ldquo;tunneling&rdquo;) here. This blog post assumes this knowledge.
+But what happens behind the scenes when the above-mentioned command is executed? What happens in the SSH client and server when they respond to this port forwarding instruction?" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ophirharpaz.github.io/posts/how-does-ssh-port-forwarding-work/" />
+<meta property="article:published_time" content="2020-04-09T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-04-09T00:00:00+00:00" />
+
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="https://ophirharpaz.github.io/"><img class="app-header-avatar" src="/avatar.jpg" alt="Ophir Harpaz" /></a>
+      <h1>Ophir&#39;s Tech-Blogging Drawer</h1>
+      <p>My tech-blogging drawer is where I put everything I write on tech and security.</p>
+      <div class="app-header-social">
+        
+      </div>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">How Does SSH Port Forwarding Work?</h1>
+      <div class="post-meta">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          Apr 9, 2020
+        </div>
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          10 min read
+        </div></div>
+    </header>
+    <div class="post-content">
+      <p>I often use the command <code>ssh server_addr -L localport:remoteaddr:remoteport</code> to create an SSH tunnel.
+This allows me, for example, to communicate with a host that is only accessible to the SSH server.
+You can read more about SSH port forwarding (also known as &ldquo;tunneling&rdquo;) <a href="https://help.ubuntu.com/community/SSH/OpenSSH/PortForwarding">here</a>.
+This blog post assumes this knowledge.</p>
+<p>But what happens behind the scenes when the above-mentioned command is executed?
+What happens in the SSH client and server when they respond to this port forwarding instruction?</p>
+<p>In this blog post, I&rsquo;ll focus on the <a href="https://github.com/mkj/dropbear"><em>DropBear SSH</em></a>
+implementation and also stick to <em>local</em> (as opposed to <em>remote</em>) port forwarding. I am <em>not</em> describing my personal
+research process here, because there&rsquo;s already enough information to share. Believe me ;)</p>
+<h2 id="tldr">TL;DR</h2>
+<p>This section summarizes the process without quoting any line of code.
+If you wish to understand how local port forwarding works in SSH, without going into any specific implementation,
+this section will definitely suffice.</p>
+<p><img src="/images/ssh_port_forwarding.png" alt="SSH Local Port Forwarding in a Diagram" title="SSH Local Port Forwarding in a Diagram"></p>
+<ol>
+<li>The client creates a <strong>socket</strong> and binds it to <em>localaddr</em> and <em>localport</em> (actually, it binds a socket for each
+address resolved from <em>localaddr</em>, but let&rsquo;s keep things simple).
+If no <em>localaddr</em> is specified (which is usually the case for me), the client will create a socket for <em>localhost</em>.
+<code>listen()</code> is called on the created, bound socket.</li>
+<li>Once a connection is accepted on the socket, the client creates a <strong>channel</strong> with the socket&rsquo;s file descriptor
+(<em>fd</em>) for reading and writing. Unlike sockets, channels are part of the SSH protocol and are not operating-system objects.</li>
+<li>The client then sends a <strong>message</strong> to the server, informing it of the new channel. The message includes the client&rsquo;s channel
+identifier (index), the local address &amp; port and the remote address &amp; port to which the server should connect later on.</li>
+<li>When the server sees this special message, it creates a new <strong>channel</strong>. It immediately &ldquo;attaches&rdquo; this channel to the
+client&rsquo;s one, using the received identifier, and sends its own identifier to the client. This way the two sides exchange channel IDs for
+future communication.</li>
+<li>Then, the server connects to the remote address and port which were specified in the client&rsquo;s payload.
+If the connection succeeds, its <strong>socket</strong> is assigned to the server&rsquo;s channel for both reading and writing.</li>
+<li>Data is sent and received between the sides whenever <code>select()</code>, which is called from the session&rsquo;s main loop,
+returns file descriptors (sockets) that are ready for I/O operations.</li>
+</ol>
+<p><strong>So just to make things clear:</strong></p>
+<ul>
+<li>On the client side — a socket is connected to the local address, which is where data is read from
+(before sending to the server) or written to (after being received from the server).</li>
+<li>On the server side, there is another socket which is connected to the remote address.
+This is where data is sent to (from the client) or received from (on its way to the client).</li>
+</ul>
+<h2 id="drill-down">Drill-Down</h2>
+<p>What follows is the specific implementation details of the <em>DropBear</em> SSH server and client. This part might be somewhat
+tedious, as it mentions many names of <em>structs</em> and functions, but it may help clarify steps from the TL;DR section
+and demonstrate them through code.</p>
+<p><strong>Important note on links:</strong> I don&rsquo;t like blog posts containing too many links, because they give me really bad FOMOs.
+Therefore, I decided <em>not</em> to link to the source code. Instead, I provide the code snippets that I find necessary,
+as well as the names of the different functions and <em>struct</em>s.</p>
+<h1 id="client-side">Client Side</h1>
+<p><strong>Setup</strong></p>
+<p>When the client reads the command line, it parses all forwarding &ldquo;rules&rdquo; and adds them to a list in <code>cli_opts.localfwds</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">cli_getopts</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span> argv) {
+    ...
+    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;L&#39;</span><span style="color:#f92672">:</span>  <span style="color:#75715e">// for the command-line flag &#34;-L&#34;
+</span><span style="color:#75715e"></span>        opt <span style="color:#f92672">=</span> OPT_LOCALTCPFWD;
+        <span style="color:#66d9ef">break</span>;
+    ...
+    <span style="color:#66d9ef">if</span> (opt <span style="color:#f92672">==</span> OPT_LOCALTCPFWD) {
+        addforward(<span style="color:#f92672">&amp;</span>argv[i][j], cli_opts.localfwds);
+    }
+    ...
+}
+</code></pre></div><p>In the client&rsquo;s session loop, the function <code>setup_localtcp()</code> is called.
+This function iterates on all TCP forwarding entries that were previously added and calls <code>cli_localtcp</code> on each.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setup_localtcp</span>() {
+    ...
+    <span style="color:#66d9ef">for</span> (iter <span style="color:#f92672">=</span> cli_opts.localfwds<span style="color:#f92672">-&gt;</span>first; iter; iter <span style="color:#f92672">=</span> iter<span style="color:#f92672">-&gt;</span>next) {
+        <span style="color:#75715e">/* TCPFwdEntry is the struct that holds the forwarding details -
+</span><span style="color:#75715e">           local and remote addresses and ports */</span>
+        <span style="color:#66d9ef">struct</span> TCPFwdEntry <span style="color:#f92672">*</span> fwd <span style="color:#f92672">=</span> (<span style="color:#66d9ef">struct</span> TCPFwdEntry<span style="color:#f92672">*</span>)iter<span style="color:#f92672">-&gt;</span>item;
+        ret <span style="color:#f92672">=</span> cli_localtcp(
+                fwd<span style="color:#f92672">-&gt;</span>listenaddr,
+                fwd<span style="color:#f92672">-&gt;</span>listenport,
+                fwd<span style="color:#f92672">-&gt;</span>connectaddr,
+                fwd<span style="color:#f92672">-&gt;</span>connectport);
+    ...
+}
+</code></pre></div><p>The function <code>cli_localtcp()</code> creates a <code>TCPListener</code> entry. This entry specifies not only the forwarding details,
+but also the type of the channel that should be created (<em>cli_chan_tcplocal</em>) and the TCP type (<em>direct</em>).
+For each new TCP listener, it calls <code>listen_tcpfwd()</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">cli_localtcp</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> listenaddr, 
+        <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> listenport, 
+        <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> remoteaddr,
+        <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> remoteport) {
+
+    <span style="color:#66d9ef">struct</span> TCPListener<span style="color:#f92672">*</span> tcpinfo <span style="color:#f92672">=</span> NULL;
+    <span style="color:#66d9ef">int</span> ret;
+
+    tcpinfo <span style="color:#f92672">=</span> (<span style="color:#66d9ef">struct</span> TCPListener<span style="color:#f92672">*</span>)m_malloc(<span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">struct</span> TCPListener));
+
+    <span style="color:#75715e">/* Assign the listening address &amp; port, 
+</span><span style="color:#75715e">       and the remote address &amp; port*/</span>
+    tcpinfo<span style="color:#f92672">-&gt;</span>sendaddr <span style="color:#f92672">=</span> m_strdup(remoteaddr);
+    tcpinfo<span style="color:#f92672">-&gt;</span>sendport <span style="color:#f92672">=</span> remoteport;
+
+    <span style="color:#66d9ef">if</span> (listenaddr)
+    {
+        tcpinfo<span style="color:#f92672">-&gt;</span>listenaddr <span style="color:#f92672">=</span> m_strdup(listenaddr);
+    }
+    <span style="color:#66d9ef">else</span>
+    {
+        ...
+        tcpinfo<span style="color:#f92672">-&gt;</span>listenaddr <span style="color:#f92672">=</span> m_strdup(<span style="color:#e6db74">&#34;localhost&#34;</span>);
+        ...
+    }
+    tcpinfo<span style="color:#f92672">-&gt;</span>listenport <span style="color:#f92672">=</span> listenport;
+
+    <span style="color:#75715e">/* Specify channel type and TCP type */</span>
+    tcpinfo<span style="color:#f92672">-&gt;</span>chantype <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>cli_chan_tcplocal;
+    tcpinfo<span style="color:#f92672">-&gt;</span>tcp_type <span style="color:#f92672">=</span> direct;
+
+    ret <span style="color:#f92672">=</span> listen_tcpfwd(tcpinfo, NULL);
+    ...
+}
+</code></pre></div><p><strong>Creating a Socket</strong></p>
+<p><code>listen_tcpfwd()</code> does the following:</p>
+<ul>
+<li>
+<p>calls <code>dropbear_listen()</code> to start listening on the local address and port.
+This is where sockets are actually created and bound to the client-provided address and port.</p>
+</li>
+<li>
+<p>creates a new <code>Listener</code> object. This object contains the sockets on which listening should take place,
+and also specifies an &ldquo;acceptor&rdquo; - a callback function that is responsible for calling <code>accept()</code>.
+Each listener is constructed with the sockets that <code>dropbear_listen()</code> returned, and with an acceptor function named
+<code>tcp_acceptor()</code>.</p>
+</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">listen_tcpfwd</span>(<span style="color:#66d9ef">struct</span> TCPListener<span style="color:#f92672">*</span> tcpinfo, <span style="color:#66d9ef">struct</span> Listener <span style="color:#f92672">**</span>ret_listener) {
+
+	<span style="color:#66d9ef">char</span> portstring[NI_MAXSERV];
+	<span style="color:#66d9ef">int</span> socks[DROPBEAR_MAX_SOCKS];
+	<span style="color:#66d9ef">int</span> nsocks;
+	<span style="color:#66d9ef">struct</span> Listener <span style="color:#f92672">*</span>listener;
+	<span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> errstring <span style="color:#f92672">=</span> NULL;
+
+	snprintf(portstring, <span style="color:#66d9ef">sizeof</span>(portstring), <span style="color:#e6db74">&#34;%u&#34;</span>, tcpinfo<span style="color:#f92672">-&gt;</span>listenport);
+	
+	<span style="color:#75715e">/* Create sockets and listen on them */</span>
+	nsocks <span style="color:#f92672">=</span> dropbear_listen(tcpinfo<span style="color:#f92672">-&gt;</span>listenaddr, portstring, socks, 
+			DROPBEAR_MAX_SOCKS, <span style="color:#f92672">&amp;</span>errstring, <span style="color:#f92672">&amp;</span>ses.maxfd);
+	...
+	<span style="color:#75715e">/* Put the list of sockets in a new Listener object */</span>
+	listener <span style="color:#f92672">=</span> new_listener(socks, nsocks, CHANNEL_ID_TCPFORWARDED, tcpinfo, 
+			tcp_acceptor, cleanup_tcp);
+	...
+}
+</code></pre></div><p><strong>Creating a Channel</strong></p>
+<p><code>tcp_acceptor()</code> is responsible for accepting connections to a socket. <strong>This is where the action happens</strong>.
+The function creates a new channel of type <em>cli_chan_tcplocal</em> (for local port forwarding),
+then calls <code>send_msg_channel_open_init()</code> to:</p>
+<ol>
+<li>inform the server of the client&rsquo;s newly-created channel;</li>
+<li>tell it to create a channel of its own.</li>
+</ol>
+<p>Once this <code>CHANNEL_OPEN</code> message is sent successfully, the client fetches the addresses and ports from the listener object,
+and puts them inside the payload to be sent.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">tcp_acceptor</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">struct</span> Listener <span style="color:#f92672">*</span>listener, <span style="color:#66d9ef">int</span> sock) {
+
+    <span style="color:#66d9ef">int</span> fd;
+    <span style="color:#66d9ef">struct</span> sockaddr_storage sa;
+    socklen_t len;
+    <span style="color:#66d9ef">char</span> ipstring[NI_MAXHOST], portstring[NI_MAXSERV];
+    <span style="color:#66d9ef">struct</span> TCPListener <span style="color:#f92672">*</span>tcpinfo <span style="color:#f92672">=</span> (<span style="color:#66d9ef">struct</span> TCPListener<span style="color:#f92672">*</span>)(listener<span style="color:#f92672">-&gt;</span>typedata);
+
+    len <span style="color:#f92672">=</span> <span style="color:#66d9ef">sizeof</span>(sa);
+
+    fd <span style="color:#f92672">=</span> accept(sock, (<span style="color:#66d9ef">struct</span> sockaddr<span style="color:#f92672">*</span>)<span style="color:#f92672">&amp;</span>sa, <span style="color:#f92672">&amp;</span>len);
+    ...
+    <span style="color:#66d9ef">if</span> (send_msg_channel_open_init(fd, tcpinfo<span style="color:#f92672">-&gt;</span>chantype) <span style="color:#f92672">==</span> DROPBEAR_SUCCESS) {
+        <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> addr <span style="color:#f92672">=</span> NULL;
+        <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> port <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+
+        <span style="color:#66d9ef">if</span> (tcpinfo<span style="color:#f92672">-&gt;</span>tcp_type <span style="color:#f92672">==</span> direct) {
+            <span style="color:#75715e">/* &#34;direct-tcpip&#34; */</span>
+            <span style="color:#75715e">/* host to connect, port to connect */</span>
+            addr <span style="color:#f92672">=</span> tcpinfo<span style="color:#f92672">-&gt;</span>sendaddr;
+            port <span style="color:#f92672">=</span> tcpinfo<span style="color:#f92672">-&gt;</span>sendport;
+        } 
+        ...
+        <span style="color:#75715e">/* remote ip and port */</span>
+        buf_putstring(ses.writepayload, addr, strlen(addr));
+        buf_putint(ses.writepayload, port);
+
+        <span style="color:#75715e">/* originator ip and port */</span>
+        buf_putstring(ses.writepayload, ipstring, strlen(ipstring));
+        buf_putint(ses.writepayload, atol(portstring));
+     ...
+}
+</code></pre></div><p>Whenever the server responds with its own channel ID - the client will be able to to send and receive data based on the
+specified forwarding rule.</p>
+<h1 id="server-side">Server Side</h1>
+<p><strong>Creating a Channel (upon client&rsquo;s request)</strong></p>
+<p>The server is informed of the local port forwarding only the moment it receives the <code>MSG_CHANNEL_OPEN</code> message from the
+client. Handling this message happens in the function
+<code>recv_msg_channel_open()</code>.
+This function creates a new channel of type <em>svr_chan_tcpdirect</em>, and calls the channel initialization function,
+named <code>newtcpdirect()</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">recv_msg_channel_open</span>() {
+    ...
+    <span style="color:#75715e">/* get the packet contents */</span>
+    type <span style="color:#f92672">=</span> buf_getstring(ses.payload, <span style="color:#f92672">&amp;</span>typelen);
+    
+    remotechan <span style="color:#f92672">=</span> buf_getint(ses.payload);
+    ...
+    
+    <span style="color:#75715e">/* The server finds out the type of the client&#39;s channel,
+</span><span style="color:#75715e">       to create a channel of the same type (&#34;direct-tcpip&#34;) */</span>
+    <span style="color:#66d9ef">for</span> (cp <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>ses.chantypes[<span style="color:#ae81ff">0</span>], chantype <span style="color:#f92672">=</span> (<span style="color:#f92672">*</span>cp);  
+            chantype <span style="color:#f92672">!=</span> NULL;
+            cp<span style="color:#f92672">++</span>, chantype <span style="color:#f92672">=</span> (<span style="color:#f92672">*</span>cp)) {
+        <span style="color:#66d9ef">if</span> (strcmp(type, chantype<span style="color:#f92672">-&gt;</span>name) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+            <span style="color:#66d9ef">break</span>;
+        }
+    }
+    
+    <span style="color:#75715e">/* create the channel */</span>
+    channel <span style="color:#f92672">=</span> newchannel(remotechan, chantype, transwindow, transmaxpacket);
+    ...
+    
+        <span style="color:#75715e">/* This is where newtcpdirect is called */</span>
+    <span style="color:#66d9ef">if</span> (channel<span style="color:#f92672">-&gt;</span>type<span style="color:#f92672">-&gt;</span>inithandler) {
+        ret <span style="color:#f92672">=</span> channel<span style="color:#f92672">-&gt;</span>type<span style="color:#f92672">-&gt;</span>inithandler(channel);
+        ...
+    }
+    ...	
+    send_msg_channel_open_confirmation(channel, channel<span style="color:#f92672">-&gt;</span>recvwindow,
+            channel<span style="color:#f92672">-&gt;</span>recvmaxpacket);
+    ...
+}
+</code></pre></div><p><strong>Creating a Socket</strong></p>
+<p>The function <code>newtcpdirect()</code> is reading the buffer <code>ses.payload</code>, which contains the data put there by the client beforehand:
+the destination host and port, and the origin host and port.
+With these details, the server connects to the remote host and port with
+<code>connect_remote()</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">newtcpdirect</span>(<span style="color:#66d9ef">struct</span> Channel <span style="color:#f92672">*</span> channel) {
+	...
+	desthost <span style="color:#f92672">=</span> buf_getstring(ses.payload, <span style="color:#f92672">&amp;</span>len);
+        ...
+	destport <span style="color:#f92672">=</span> buf_getint(ses.payload);
+	orighost <span style="color:#f92672">=</span> buf_getstring(ses.payload, <span style="color:#f92672">&amp;</span>len);
+	...
+	origport <span style="color:#f92672">=</span> buf_getint(ses.payload);
+	snprintf(portstring, <span style="color:#66d9ef">sizeof</span>(portstring), <span style="color:#e6db74">&#34;%u&#34;</span>, destport);
+	
+	<span style="color:#75715e">/* Connect to the remote host */</span>
+	channel<span style="color:#f92672">-&gt;</span>conn_pending <span style="color:#f92672">=</span> connect_remote(desthost, portstring, channel_connect_done, channel, NULL, NULL);
+	...
+}
+</code></pre></div><p>This function creates a connection object <code>c</code> (of type <code>dropbear_progress_connection</code>) in which it stores the remote address
+and port, a &ldquo;placeholder&rdquo; socket <em>fd</em> (-1) and a callback function named <code>channel_connect_done()</code>. Remember this callback for
+later on!</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">struct</span> dropbear_progress_connection <span style="color:#f92672">*</span><span style="color:#a6e22e">connect_remote</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> remotehost, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> remoteport,
+	connect_callback cb, <span style="color:#66d9ef">void</span><span style="color:#f92672">*</span> cb_data, 
+	<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> bind_address, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> bind_port)
+{
+	<span style="color:#66d9ef">struct</span> dropbear_progress_connection <span style="color:#f92672">*</span>c <span style="color:#f92672">=</span> NULL;
+    ...
+        <span style="color:#75715e">/* Populate the connection object */</span>
+	c <span style="color:#f92672">=</span> m_malloc(<span style="color:#66d9ef">sizeof</span>(<span style="color:#f92672">*</span>c));
+	c<span style="color:#f92672">-&gt;</span>remotehost <span style="color:#f92672">=</span> m_strdup(remotehost);
+	c<span style="color:#f92672">-&gt;</span>remoteport <span style="color:#f92672">=</span> m_strdup(remoteport);
+	c<span style="color:#f92672">-&gt;</span>sock <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
+	c<span style="color:#f92672">-&gt;</span>cb <span style="color:#f92672">=</span> cb;
+	c<span style="color:#f92672">-&gt;</span>cb_data <span style="color:#f92672">=</span> cb_data;
+
+	list_append(<span style="color:#f92672">&amp;</span>ses.conn_pending, c);
+	...
+        <span style="color:#75715e">/* c-&gt;res contains addresses resolved from the remotehost &amp; remoteport.
+</span><span style="color:#75715e">           This is a list of addresses, for each a socket is needed. */</span>
+	err <span style="color:#f92672">=</span> getaddrinfo(remotehost, remoteport, <span style="color:#f92672">&amp;</span>hints, <span style="color:#f92672">&amp;</span>c<span style="color:#f92672">-&gt;</span>res);
+	<span style="color:#66d9ef">if</span> (err) {
+		...
+	} <span style="color:#66d9ef">else</span> {
+		c<span style="color:#f92672">-&gt;</span>res_iter <span style="color:#f92672">=</span> c<span style="color:#f92672">-&gt;</span>res;
+	}
+	...
+	<span style="color:#66d9ef">return</span> c;
+}
+</code></pre></div><p>As you can see in the snippet above, the connection structure is added to the list <code>sess.conn_pending</code>. This list
+will be handled in the next iteration of the session&rsquo;s main loop.
+The connection itself is done from within <code>connect_try_next()</code> function which is called by <code>set_connect_fds()</code>.
+This is where the socket is practically connected to the remote host.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">connect_try_next</span>(<span style="color:#66d9ef">struct</span> dropbear_progress_connection <span style="color:#f92672">*</span>c) {
+	<span style="color:#66d9ef">struct</span> addrinfo <span style="color:#f92672">*</span>r;
+	<span style="color:#66d9ef">int</span> err;
+	<span style="color:#66d9ef">int</span> res <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+	<span style="color:#66d9ef">int</span> fastopen <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+        ...
+	<span style="color:#66d9ef">for</span> (r <span style="color:#f92672">=</span> c<span style="color:#f92672">-&gt;</span>res_iter; r; r <span style="color:#f92672">=</span> r<span style="color:#f92672">-&gt;</span>ai_next)
+	{
+		dropbear_assert(c<span style="color:#f92672">-&gt;</span>sock <span style="color:#f92672">==</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>);
+		c<span style="color:#f92672">-&gt;</span>sock <span style="color:#f92672">=</span> socket(r<span style="color:#f92672">-&gt;</span>ai_family, r<span style="color:#f92672">-&gt;</span>ai_socktype, r<span style="color:#f92672">-&gt;</span>ai_protocol);
+		...
+		<span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>fastopen) {
+			res <span style="color:#f92672">=</span> connect(c<span style="color:#f92672">-&gt;</span>sock, r<span style="color:#f92672">-&gt;</span>ai_addr, r<span style="color:#f92672">-&gt;</span>ai_addrlen);
+		}
+                ...
+	}
+	...	
+}
+</code></pre></div><p><strong>Assigning the Socket to the Channel</strong></p>
+<p>The status of the connection to the remote host is checked in <code>handle_connect_fds</code>, also from the session loop.
+This is where, if the connection succeeded, its callback is invoked - remember our callback?</p>
+<p>The callback function
+<code>channel_connect_done()</code> receives the socket and the channel itself (in the <em>user_data</em> parameter).
+The function sets the socket&rsquo;s <em>fd</em> to be the channel&rsquo;s source of reading
+and the destination of writing. With that, all I/O is done against the remote address.</p>
+<p>Finally, a confirmation message is sent back to the client with the channel identifier.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">channel_connect_done</span>(<span style="color:#66d9ef">int</span> result, <span style="color:#66d9ef">int</span> sock, <span style="color:#66d9ef">void</span><span style="color:#f92672">*</span> user_data, 
+                          <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> UNUSED(errstring)) {
+
+	<span style="color:#66d9ef">struct</span> Channel <span style="color:#f92672">*</span>channel <span style="color:#f92672">=</span> user_data;
+
+	<span style="color:#66d9ef">if</span> (result <span style="color:#f92672">==</span> DROPBEAR_SUCCESS)
+	{
+		channel<span style="color:#f92672">-&gt;</span>readfd <span style="color:#f92672">=</span> channel<span style="color:#f92672">-&gt;</span>writefd <span style="color:#f92672">=</span> sock;
+		...
+		send_msg_channel_open_confirmation(channel, channel<span style="color:#f92672">-&gt;</span>recvwindow,
+				channel<span style="color:#f92672">-&gt;</span>recvmaxpacket);
+	        ...
+	}
+	...
+}
+</code></pre></div><p><strong>From this point on, there&rsquo;s a connection between the server&rsquo;s channel and the client&rsquo;s channel.
+On the client side, the channel is reading/writing from/to the socket connected to the local address.
+On the server side, the channel reads/writes against the remote address socket.</strong></p>
+<h2 id="epilogue">Epilogue</h2>
+<p>This type of write-up is pretty difficult to write, and even more so to read. So I&rsquo;m glad you survived.</p>
+<p>If you have any questions regarding the port forwarding mechanism - please don&rsquo;t hesitate to reach out and ask!
+I think the process can be quite confusing (at least it was for me) - and I&rsquo;d love to know which parts need more
+sharpening.</p>
+<p>It is interesting to go further and understand the session loop itself; when is reading and writing triggered?
+how exactly server-side and client-side channels are paired? I figured if I went into these as well - this post
+would become a complete RFC explanation ;) So if you find these topics interesting, I encourage you to read the source code
+and get the answers.</p>
+
+    </div>
+    <div class="post-footer">
+      
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>

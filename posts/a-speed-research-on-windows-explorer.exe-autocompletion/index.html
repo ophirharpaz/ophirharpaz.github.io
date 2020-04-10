@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <title>A Speed-Research on Windows Explorer&#39;s Auto-Completion // Ophir&#39;s Tech-Blogging Drawer</title>
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.69.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Ophir Harpaz" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="https://ophirharpaz.github.io/css/main.min.ae2c98d0a99ba1fcfa761cdd94c664d871f397fdc15abbe8c66dc5fb512ebe27.css" />
+    <link rel="icon" type="image/png" href="favicon.png">
+
+    
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="A Speed-Research on Windows Explorer&#39;s Auto-Completion"/>
+<meta name="twitter:description" content="It was a couple of days ago at work. I pressed the keyboard shortcut Winkey&#43;R to open Windows&rsquo; Run dialog-box and started typing a file-system path to open. While doing so, the application suggested a couple of paths for me to choose from.
+Among these paths, I noticed, was a path to a folder I had previously deleted.
+ Why is Run suggesting a non-existing path? and how can I remove this path from the drop-down list?"/>
+
+    <meta property="og:title" content="A Speed-Research on Windows Explorer&#39;s Auto-Completion" />
+<meta property="og:description" content="It was a couple of days ago at work. I pressed the keyboard shortcut Winkey&#43;R to open Windows&rsquo; Run dialog-box and started typing a file-system path to open. While doing so, the application suggested a couple of paths for me to choose from.
+Among these paths, I noticed, was a path to a folder I had previously deleted.
+ Why is Run suggesting a non-existing path? and how can I remove this path from the drop-down list?" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ophirharpaz.github.io/posts/a-speed-research-on-windows-explorer.exe-autocompletion/" />
+<meta property="article:published_time" content="2019-08-09T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-08-09T00:00:00+00:00" />
+
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="https://ophirharpaz.github.io/"><img class="app-header-avatar" src="/avatar.jpg" alt="Ophir Harpaz" /></a>
+      <h1>Ophir&#39;s Tech-Blogging Drawer</h1>
+      <p>My tech-blogging drawer is where I put everything I write on tech and security.</p>
+      <div class="app-header-social">
+        
+      </div>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">A Speed-Research on Windows Explorer&#39;s Auto-Completion</h1>
+      <div class="post-meta">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          Aug 9, 2019
+        </div>
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          5 min read
+        </div></div>
+    </header>
+    <div class="post-content">
+      <p>It was a couple of days ago at work. I pressed the keyboard shortcut <em>Winkey+R</em> to open Windows&rsquo; <em>Run</em> dialog-box and
+started typing a file-system path to open. While doing so, the application suggested a couple of paths for me to choose
+from.</p>
+<p><img src="/images/2019_08_09_run_dialog_box.png" alt="Windows Run dialog-box auto-completing text" title="Windows Run dialog-box auto-completing text"></p>
+<p>Among these paths, I noticed, was a path to a folder I had previously deleted.</p>
+<blockquote>
+<p><!-- raw HTML omitted -->Why is <em>Run</em> suggesting a non-existing path? and how can I remove this path from the drop-down list?<!-- raw HTML omitted --></p>
+</blockquote>
+<p>This was the question that triggered my research, whose process and findings I will share in this post.</p>
+<h3 id="first-thing---first-aid">First Thing - First Aid</h3>
+<p>Having the above-mentioned question in mind, I didn&rsquo;t know where to start.
+The run dialog-box was some magical popup that I knew only as an end-user. I had absolutely no idea how to approach this problem.
+Luckily, <a href="https://twitter.com/ace__pace">Daniel</a> my team-leader has the answer (or the path to it) to any Windows question.</p>
+<p>I simply asked him: &ldquo;What would you do if you wanted to know how the Run dialog-box auto-completed your typed strings?&quot;.
+In response, he gave me a short intro to Windows&rsquo; windows (:neutral_face:), told me to start by finding the Run window
+object and set me off.</p>
+<h3 id="the-research-process">The Research Process</h3>
+<p>In hindsight, I can split the research into 3 stages:</p>
+<ol>
+<li><strong>Identify the process</strong> which is responsible for the <em>Run</em> dialog-box;</li>
+<li><strong>Find the autocomplete-related events</strong> performed by this process;</li>
+<li><strong>Conclude the answer</strong> to my question.</li>
+</ol>
+<h1 id="1-identifying-the-run-dialog-boxs-process">1. Identifying the Run dialog-box&rsquo;s Process</h1>
+<p>In order to understand where <em>Run</em> stored its saved paths, I needed to first find the process responsible for its dialog-box.
+Both <em>Process Explorer</em> and <em>Process Monitor</em> from <a href="https://docs.microsoft.com/en-us/sysinternals/downloads/sysinternals-suite">Sysinternals Suite</a>
+help with window-to-process mapping; they have a nice feature that lets you point a special cursor at a UI window
+and get the process which created it.</p>
+<p><img src="/images/procexp_cursor.png" alt="Process Explorer enables to locate a window&rsquo;s process by hovering over it with a designated cursor" title="Process Explorer Find Window's Process"></p>
+<p>Another tool named <a href="https://docs.microsoft.com/en-us/visualstudio/debugger/introducing-spy-increment?view=vs-2019"><em>Spy++</em></a>
+comes bundled with Microsoft Visual Studio. Compared to <em>Process Monitor</em> and <em>Process Explorer</em>, <em>Spy++</em> is much more
+window-oriented and displays the complete window hierarchy of the current session.
+I decided to go with <em>Spy++</em> as it was both new to me and felt more accurate for the mission.</p>
+<p>Using <em>Spy++</em> I identified the <em>Run</em> dialog-box&rsquo;s process. It turned out that this window is named <em>Run</em> and belongs to
+the <em>explorer.exe</em> process (the gif below shows only the process ID; I inferred the process name using <em>Process Explorer</em>).</p>
+<p><img src="/images/spy_process.gif" alt="Spy++ enables mapping between windows and their processes" title="Spy++ enables mapping between windows and their processes"></p>
+<h1 id="2-tracing-explorerexes-auto-complete-events">2. Tracing explorer.exe&rsquo;s Auto-Complete Events</h1>
+<p>My go-to tool for monitoring a process is, well, <em>Process Monitor</em>.
+Once I knew I should concentrate on <em>explorer.exe</em>, I started capturing events in <em>Process Monitor</em>, opened the <em>Run</em>
+dialog box and started typing arbitrary paths. Then I used a filter to display only <em>explorer.exe</em> events.
+The problem is, <em>explorer.exe</em> creates shit-tons of events, non-stop.</p>
+<p>I went back to <em>Spy++</em> looking for more information on the <em>Run</em> window, and noticed its thread ID (TID).
+With this information, the task of filtering out irrelevant <em>explorer.exe</em> events became much easier.</p>
+<p>Even after filtering, there were still many events. Briefly scanning them, I saw a registry-write event referring to a
+key named <em><strong>RunMRU</strong></em>. Seeing the word &ldquo;Run&rdquo;, and recalling that <em>MRU</em> stands for &ldquo;most recently used&rdquo;, I figured this
+might be the place I was searching for.</p>
+<p><img src="/images/mru_in_procmon.png" alt="Process Monitor shows registry-write events, accessing a key named RunMRU" title="Registry Writes to MRU Keys"></p>
+<h1 id="3-reaching-conclusions">3. Reaching Conclusions</h1>
+<p>I went straight to the registry path <code>HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU\MRUList</code> where I
+found my answer:</p>
+<p><img src="/images/registry.png" alt="Windows Registry contains the most-recently used paths typed in the Run dialog-box" title="MRU Paths in the Registry"></p>
+<p>This key listed my most recently used paths, and was clearly &ldquo;feeding&rdquo; the <em>Run</em> auto-complete feature.
+The path to the non-existent folder was there &ndash; and <em>this</em> is why the <em>Run</em> dialog-box kept suggesting it!
+Woohooooooooo!</p>
+<p>I tested my theory by evicting the non-existent path from the MRU list. I simply entered new paths to the text box until
+the non-existent path was pushed out. Once the path was no longer in the registry, it never appeared again in the
+drop down list.</p>
+<p>Actually, the MRU mechanism is pretty sweet so I&rsquo;ll elaborate a bit.</p>
+<p><em>explorer.exe</em> saves 26 paths at each given moment. Why 26? Because each path is saved in a key whose name is a letter
+between a and z. The &ldquo;most&rdquo; part in the &ldquo;MRU&rdquo; is encoded in the <em>MRUList</em> key. This is a string consisting of all 26
+alphabet letters, the first letter being the newest entry and the last letter being the oldest.
+This string determines the order of the paths that appear when you hit the down-arrow in the Run dialog-box.</p>
+<h1 id="4-a-follow-up-question">4. A Follow-Up Question</h1>
+<p>I noticed two scenarios:</p>
+<ol>
+<li><em>Run</em> suggests <strong>non-existing paths</strong> that I <strong>once typed</strong>;</li>
+<li><em>Run</em> suggests <strong>existing paths</strong> that I <strong>never-in-my-life typed</strong>.</li>
+</ol>
+<p>The first scenario can be explained by the MRU list, but the second still needs clarification. My assumption is that
+<em>explorer.exe</em> traverses the file-system in real time, and is therefore capable of suggesting paths that were never typed-in.
+However, I&rsquo;ll leave it for (someone&rsquo;s, maybe my) further work.</p>
+<h3 id="summing-up">Summing Up</h3>
+<p>This short blog post shows how I did a quick research on a mechanism in Windows that I thought was interesting.
+I found out that <em>Run</em> dialog-box auto-completes file-paths based on a list of 26 most-recently-used paths in the registry.</p>
+<p>I believe these questions, that arise from one&rsquo;s curiosity, are the ones that are most satisfying to answer :)
+I hope you always stay curious enough to ask questions and restless enough to answer them.</p>
+
+    </div>
+    <div class="post-footer">
+      
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>

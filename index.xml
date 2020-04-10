@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ophir&#39;s Tech-Blogging Drawer</title>
+    <link>https://ophirharpaz.github.io/</link>
+    <description>Recent content on Ophir&#39;s Tech-Blogging Drawer</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 09 Apr 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://ophirharpaz.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>How Does SSH Port Forwarding Work?</title>
+      <link>https://ophirharpaz.github.io/posts/how-does-ssh-port-forwarding-work/</link>
+      <pubDate>Thu, 09 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/how-does-ssh-port-forwarding-work/</guid>
+      <description>I often use the command ssh server_addr -L localport:remoteaddr:remoteport to create an SSH tunnel. This allows me, for example, to communicate with a host that is only accessible to the SSH server. You can read more about SSH port forwarding (also known as &amp;ldquo;tunneling&amp;rdquo;) here. This blog post assumes this knowledge.
+But what happens behind the scenes when the above-mentioned command is executed? What happens in the SSH client and server when they respond to this port forwarding instruction?</description>
+    </item>
+    
+    <item>
+      <title>Using Peewee&#39;s Expression to Perform Array Operations</title>
+      <link>https://ophirharpaz.github.io/posts/peewee/</link>
+      <pubDate>Fri, 27 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/peewee/</guid>
+      <description>This is a story about problem solving. True, it involves Python and database code, but eventually what I&amp;rsquo;m describing is running into a problem, understanding its root cause and finding a creative way to solve it.
+To understand this blog post, all you need to know is some SQL. I&amp;rsquo;ll try to take care of the rest.
+Entities &amp;amp; Schema For the sake of simplicity, we&amp;rsquo;ll be talking about Books and Authors.</description>
+    </item>
+    
+    <item>
+      <title>Call-For-Papers DOs and DON&#39;Ts</title>
+      <link>https://ophirharpaz.github.io/posts/cfps/</link>
+      <pubDate>Thu, 12 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/cfps/</guid>
+      <description>It was two months ago when BlueHat IL’s org-team approached me. At first, I thought they called to ask me to submit a talk. BlueHat IL is one of my favorite information security conferences, so you can imagine I was extremely flattered when I realized they wanted me to review others’ submissions.
+The review process took place in the busiest month possible. I spoke together with Daniel in various conferences (Hackfest, DeepSec and Botconf) and taught a threat hunting workshop in my community, Baot.</description>
+    </item>
+    
+    <item>
+      <title>A Speed-Research on Windows Explorer&#39;s Auto-Completion</title>
+      <link>https://ophirharpaz.github.io/posts/a-speed-research-on-windows-explorer.exe-autocompletion/</link>
+      <pubDate>Fri, 09 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/a-speed-research-on-windows-explorer.exe-autocompletion/</guid>
+      <description>It was a couple of days ago at work. I pressed the keyboard shortcut Winkey+R to open Windows&amp;rsquo; Run dialog-box and started typing a file-system path to open. While doing so, the application suggested a couple of paths for me to choose from.
+Among these paths, I noticed, was a path to a folder I had previously deleted.
+ Why is Run suggesting a non-existing path? and how can I remove this path from the drop-down list?</description>
+    </item>
+    
+    <item>
+      <title>Attaching to Windows Kernel with KDNET — a Short Guide</title>
+      <link>https://ophirharpaz.github.io/posts/attaching-to-windows-kernel/</link>
+      <pubDate>Thu, 25 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/attaching-to-windows-kernel/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>IResponse to IEcnrypt</title>
+      <link>https://ophirharpaz.github.io/posts/iresponse-to-iencrypt/</link>
+      <pubDate>Fri, 05 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/iresponse-to-iencrypt/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>MongoDB Basic Document Grouping</title>
+      <link>https://ophirharpaz.github.io/posts/mongo-db-grouping/</link>
+      <pubDate>Thu, 28 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/mongo-db-grouping/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>From A to W — Character Conversion in Windows API</title>
+      <link>https://ophirharpaz.github.io/posts/from-a-to-z/</link>
+      <pubDate>Wed, 21 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/from-a-to-z/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>A Summary of x86 String Instructions</title>
+      <link>https://ophirharpaz.github.io/posts/x86-strings-summary/</link>
+      <pubDate>Mon, 23 Jul 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/x86-strings-summary/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>5&#43;1 Reasons Why You Need to Go to REcon</title>
+      <link>https://ophirharpaz.github.io/posts/why-you-need-to-go-to-recon/</link>
+      <pubDate>Thu, 21 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/why-you-need-to-go-to-recon/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Put The Flags Out! — Hacking Minesweeper</title>
+      <link>https://ophirharpaz.github.io/posts/put-the-flags-out/</link>
+      <pubDate>Fri, 13 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/put-the-flags-out/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>TrickBot’s Cryptocurrency Hunger — Tricking the Bitcoin Out of Wallets</title>
+      <link>https://ophirharpaz.github.io/posts/trickbot-crypto-hunger/</link>
+      <pubDate>Thu, 15 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/trickbot-crypto-hunger/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Installing IP Cameras or How I started monitoring my cats</title>
+      <link>https://ophirharpaz.github.io/posts/installing-ip-cameras/</link>
+      <pubDate>Sat, 29 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/installing-ip-cameras/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
