@@ -89,7 +89,7 @@ this section will definitely suffice.</p>
 <ol>
 <li>The client creates a <strong>socket</strong> and binds it to <em>localaddr</em> and <em>localport</em> (actually, it binds a socket for each
 address resolved from <em>localaddr</em>, but let&rsquo;s keep things simple).
-If no <em>localaddr</em> is specified (which is usually the case for me), the client will create a socket for <em>localhost</em>.
+If no <em>localaddr</em> is specified (which is usually the case for me), the client will create a socket for <em>localhost</em> or all network interfaces (implementation-dependent).
 <code>listen()</code> is called on the created, bound socket.</li>
 <li>Once a connection is accepted on the socket, the client creates a <strong>channel</strong> with the socket&rsquo;s file descriptor
 (<em>fd</em>) for reading and writing. Unlike sockets, channels are part of the SSH protocol and are not operating-system objects.</li>
