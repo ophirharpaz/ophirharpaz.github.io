@@ -123,7 +123,7 @@ But how come <code>2**31-1</code>, which is the highest positive number, resulte
            = 450 * 2**33 - (900)  
            = 450 * 0 - 900  // 2**33 reuslts in a zero for the same reason as before
            = -900
-</code></pre><p>Practially, the same thing happens. Both inputs are large enough to result in a zero, leaving only the <code>-900</code> &ldquo;remainder&rdquo;. The only difference with regards to the challenge is that the first input passes the positivity check (line 6 in the challenge code), whereas the second doesn&rsquo;t.</p>
+</code></pre><p>Practially, the same thing happens. Both inputs are large enough to result in a zero, leaving only the <code>-900</code> as a remainder. The only difference with regards to the challenge is that the first input passes the positivity check (line 6 in the challenge code), whereas the second doesn&rsquo;t.</p>
 <h3 id="bonus-the-one-iteration-solution">Bonus: The One-Iteration Solution</h3>
 <p>What if we had to reach a balance higher than 100,000 with only a <em>single</em> iteration? What if we wanted the quickest win possible?
 Recall that with an input of <code>2**31-1</code>, we got an increase of <code>900*1</code>.
