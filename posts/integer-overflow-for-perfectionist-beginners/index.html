@@ -96,7 +96,7 @@ In this challenge, you are a visitor in a flag shop. You can purchase the flag f
 <p>Our first thought was &ldquo;Ok, let&rsquo;s have <code>number_flags = -1</code>&rdquo;. This will cause the total cost to be -900, leading to our balance growing by 900, right?
 -1 is represented by 32 set bits, which can be obtained from the number <code>2**32-1</code>. But this didn&rsquo;t work, and nothing happened to our balance.</p>
 <p>In a quick brute-force attempt we passed <code>2**31-1</code> as an input and <strong>boom</strong>, our balance increased to 2000.
-So we managed to trigger the integer overflow, because <code>total_cost</code> was negative, but why with the second input and not the first?</p>
+So we managed to trigger the integer overflow, because <code>total_cost</code> was negative, but <strong>why with the second input and not the first</strong>? The next section will answer this question.</p>
 <h3 id="breakdown">Breakdown</h3>
 <p>It took us some time to rediscover the first <code>if</code> statement (line 6). When our input was <code>2**32-1 = -1</code>, we never reached the code which calculates our new balance. So <code>2**32-1</code> was prone to failure. But why, <strong>why</strong> did <code>2**31-1</code> did the job in getting us +900 coins?</p>
 <p>Let&rsquo;s go back to some theory.</p>
