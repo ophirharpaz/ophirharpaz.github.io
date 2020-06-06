@@ -6,10 +6,20 @@
     <description>Recent content in Posts on Ophir Harpaz&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 09 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 06 Jun 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://ophirharpaz.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Integer Overflow for the Perfectionst Beginner</title>
+      <link>https://ophirharpaz.github.io/posts/integer-overflow-for-perfectionist-beginners/</link>
+      <pubDate>Sat, 06 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/integer-overflow-for-perfectionist-beginners/</guid>
+      <description>Sometimes you succeed in solving a problem but you don&amp;rsquo;t truly understand why it worked. This is what happened to Mor and me when we solved PicoCTF-2019 challenge called flag_shop.
+In this challenge, you are a visitor in a flag shop. You can purchase the flag for a certain number of coins, then print it and win. The problem is, the winning flag costs 100,000 coins, and we only have 1,100.</description>
+    </item>
     
     <item>
       <title>How Does SSH Port Forwarding Work?</title>
