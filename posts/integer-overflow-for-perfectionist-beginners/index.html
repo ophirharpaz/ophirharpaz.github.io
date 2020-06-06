@@ -107,7 +107,7 @@ So we managed to trigger the integer overflow, because <code>total_cost</code> w
 <p>By providing <code>2**31-1</code> as input, we practically gave the <strong>highest positive number</strong> possible with a signed integer.
 This is why we successfully passed the <code>if</code> check - the number of requested flags was positive.
 But how come <code>2**31-1</code>, which is the highest positive number, resulted in the same value we expected to get with <code>2**32-1</code>?</p>
-<p>Let&rsquo;s do the math associated with line 7. And trust me, if it&rsquo;s me who&rsquo;s doing the math, it&rsquo;s going to be easy.</p>
+<p>Let&rsquo;s do the math associated with line 7. Trust me, this is going to be pretty basic arithmetic :)</p>
 <pre><code>total_cost = 900 * number_flags
            = 900 * (2**31 - 1)
            = 450 * 2 * (2**31 - 1)
