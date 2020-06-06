@@ -91,14 +91,14 @@ In this challenge, you are a visitor in a flag shop. You can purchase the flag f
     }
 }
 </code></pre></div><p>[1] - This is a slight simplification of the challenge, but the main concept remains.</p>
-<p>Quite quickly we understood that our goal was to <strong>increase</strong> <code>account_balance</code> to a value higher than 100,000 - the price of our desired flag. If only <code>total_cost</code> could be negative (line 9), we could increase our balance. The good news is, <code>total_cost</code> <strong>can</strong> be negative if we trigger an integer overflow. Namely, if <code>total_cost</code> is high enough such that its most-significant bit is set - it&rsquo;ll be considered negative (if you&rsquo;re not at all familiar with integer overflows, <a href="https://en.wikipedia.org/wiki/Integer_overflow">read</a> and then come back, we&rsquo;ll be waiting).</p>
+<p>Quite quickly we understood that our goal was to <strong>increase</strong> <code>account_balance</code> to a value higher than 100,000 - the price of our desired flag. If only <code>total_cost</code> could be negative (line 9), we could increase our balance. The good news is, <code>total_cost</code> <strong>can</strong> be negative if we trigger an integer overflow. Namely, if <code>total_cost</code> is high enough such that its most-significant bit is set - it&rsquo;ll be considered negative (if you&rsquo;re not familiar with integer overflows at all, <a href="https://en.wikipedia.org/wiki/Integer_overflow">read</a> and then come back, we&rsquo;ll be waiting).</p>
 <h3 id="first-attempt">First Attempt</h3>
 <p>Our first thought was &ldquo;Ok, let&rsquo;s have <code>number_flags = -1</code>&rdquo;. This will cause the total cost to be -900, leading to our balance growing by 900, right?
 -1 is represented by 32 set bits, which can be obtained from the number <code>2**32-1</code>. But this didn&rsquo;t work, and nothing happened to our balance.</p>
 <p>In a quick brute-force attempt we passed <code>2**31-1</code> as an input and <strong>boom</strong>, our balance increased to 2000.
 So we managed to trigger the integer overflow, because <code>total_cost</code> was negative, but <strong>why with the second input and not the first</strong>? The next section will answer this question.</p>
 <h3 id="breakdown">Breakdown</h3>
-<p>It took us some time to rediscover the first <code>if</code> statement (line 6). When our input was <code>2**32-1 = -1</code>, we never reached the code which calculates our new balance. So <code>2**32-1</code> was prone to failure. But why, <strong>why</strong> did <code>2**31-1</code> did the job in getting us +900 coins?</p>
+<p>It took us some time to rediscover the first <code>if</code> statement (line 6). When our input was <code>2**32-1 = -1</code>, we never reached the code which calculates our new balance. So <code>2**32-1</code> was prone to failure. But why, <strong>why</strong> did <code>2**31-1</code> do the job in getting us +900 coins?</p>
 <p>Let&rsquo;s go back to some theory.</p>
 <ul>
 <li>Unsigned integers of 32 bits can represent any value between <code>0</code> and <code>2**32-1</code>.</li>
