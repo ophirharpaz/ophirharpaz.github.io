@@ -6,10 +6,29 @@
     <description>Recent content on Ophir Harpaz&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 06 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 28 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://ophirharpaz.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>2 Github Accounts 1 Computer - The Shortest Guide Possible</title>
+      <link>https://ophirharpaz.github.io/posts/two-github-accounts-one-computer/</link>
+      <pubDate>Fri, 28 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/two-github-accounts-one-computer/</guid>
+      <description>One thing that&amp;rsquo;s given me headaches for too long was switching between my two Github accounts - work and personal - on the same computer. Today I decided to put an end to it, and it was as simple as ABC. Seriously, look.
+A - SSH Keys Generation I&amp;rsquo;m sure most people who are acquainted with git are familiar with this procedure. So I&amp;rsquo;ll simply link to very good instructions and leave you to it.</description>
+    </item>
+    
+    <item>
+      <title>FritzFrog: A New Generation of Peer-to-Peer Botnets</title>
+      <link>https://ophirharpaz.github.io/posts/fritzfrog/</link>
+      <pubDate>Wed, 19 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/fritzfrog/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Integer Overflow for the Perfectionist Beginner</title>
