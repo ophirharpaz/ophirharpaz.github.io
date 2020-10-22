@@ -86,7 +86,7 @@ CIPHERTEXT <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34
 <ol>
 <li>This is a <strong>simple substitution cipher</strong>: each plaintext letter is mapped onto a single ciphertext letter
 (e.g. if <code>a</code> is mapped onto <code>q</code>, then <code>a</code> in the plaintext appears as <code>q</code> in the ciphertext).</li>
-<li>There are <strong>no spaces</strong> in the original message.</li>
+<li>The original message is <strong>in English</strong> and has <strong>no spaces</strong>.</li>
 </ol>
 <p>If you feel like giving it a shot without reading how I did it, go ahead :)</p>
 <h1 id="take-1---letter-frequencies">Take 1 - Letter Frequencies</h1>
@@ -123,7 +123,7 @@ peer pressure, I went on to look at bigrams.</p>
 serve as the basis for frequency analysis.
 For example, in the sentence &ldquo;I think there&rsquo;s a problem there&rdquo;, the most frequent bigram is &ldquo;th&rdquo; with 3
 occurrences.</p>
-<p>The most popular bigrams in <a href="https://en.wikipedia.org/wiki/Bigram#Bigram_frequency_in_the_English_language">English</a>
+<p>The 40 most popular bigrams in <a href="https://en.wikipedia.org/wiki/Bigram#Bigram_frequency_in_the_English_language">English</a>
 are (in descending order):</p>
 <pre><code>
 th, he, in, er, an, re, nd, at, on, nt, ha, es, st, en, ed, to, it, ou, ea, hi, is, or, ti, as, te, et, ng, of, al, de, se, le, sa, si, ar, ve, ra, ld, ur
@@ -193,8 +193,8 @@ final_rules <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#
 <span style="color:#f92672">&gt;&gt;</span> substitute(CIPHERTEXT, final_rules)
 <span style="color:#f92672">&gt;&gt;</span> tomgaveupthebrushwithreluctanceinhisfacebutalacrityinhisheartandwhilethelatesteamerbigmissouriworkedandsweatedinthesuntheretiredartistsatonabarrelintheshadeclosebydangledhislegsmunchedhisappleandplannedtheslaughterofmoreinnocentstherewasnolackofmaterialboyshappenedalongeverylittlewhiletheycametoxeerbutremainedtowhitewash
 
-</code></pre></div><p>As an anecdote, the initial letter frequency analysis produced a substitution rule which was 10 units distant
-from the correct rule.</p>
+</code></pre></div><p>As an anecdote, the initial letter frequency analysis produced a substitution rule which was differed in
+10 mappings from the correct one.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">
 <span style="color:#f92672">&gt;&gt;</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
 <span style="color:#f92672">..</span> <span style="color:#66d9ef">for</span> k, v <span style="color:#f92672">in</span> rules<span style="color:#f92672">.</span>items():
