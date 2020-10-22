@@ -6,25 +6,22 @@
     <meta name="generator" content="Hugo 0.69.0" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="author" content="Ophir Harpaz" />
-    <meta name="description" content="" />
+    <meta name="description" content="My first code-breaking attempt (and success) of a ciphertext from the book The Mathematics of Secrets" />
     <link rel="stylesheet" href="https://ophirharpaz.github.io/css/main.min.ae2c98d0a99ba1fcfa761cdd94c664d871f397fdc15abbe8c66dc5fb512ebe27.css" />
     <link rel="icon" type="image/png" href="favicon.png">
 
     
-    <meta name="twitter:card" content="summary"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://images.unsplash.com/photo-1505074667853-caeef19244ba"/>
+
 <meta name="twitter:title" content="My First Letter-Frequency Cryptanalysis"/>
-<meta name="twitter:description" content="Intro As part of my effort to get better acquainted with cryptography, I&rsquo;ve started reading &ldquo;The Mathematics of Secrets&rdquo;, a book by Joshua Holden which aims to explain the mathematical concepts behind cryptography of both ancient and modern times.
-In its second chapter (page 31), Holden poses a challenge to the reader - deciphering a message:
-CIPHERTEXT = &#34;QBVDLWXTEQGXOKTNGZJQGKXSTRQLYRXJYGJNALRXOTQLSLRKJQFJYGJNGXLKQLYUZGJSXQGXSLQXNQXLVXKOJDVJNNBTKJZBKPXULYUNZXLQXUJYQGXNTYQGXKXQJKXULKQJNQNLQBYLOLKKXSJYQGXNGLUXRSBNXOFULYDSXUGJNSXDNVTYRGXUGJNLEESXLYUESLYYXUQGXNSLTDGQXKBAVBKXJYYBRXYQNQGXKXZLNYBSLRPBAVLQXKJLSOBFNGLEEXYXULSBYDXWXKFSJQQSXZGJSXQGXFRLVXQBMXXKOTQKXVLJYXUQBZGJQXZLNG&#34; We&rsquo;re given two pieces of information about the message:
- This is a simple substitution cipher: each plaintext letter is mapped onto a single ciphertext letter (e."/>
+<meta name="twitter:description" content="My first code-breaking attempt (and success) of a ciphertext from the book The Mathematics of Secrets"/>
 
     <meta property="og:title" content="My First Letter-Frequency Cryptanalysis" />
-<meta property="og:description" content="Intro As part of my effort to get better acquainted with cryptography, I&rsquo;ve started reading &ldquo;The Mathematics of Secrets&rdquo;, a book by Joshua Holden which aims to explain the mathematical concepts behind cryptography of both ancient and modern times.
-In its second chapter (page 31), Holden poses a challenge to the reader - deciphering a message:
-CIPHERTEXT = &#34;QBVDLWXTEQGXOKTNGZJQGKXSTRQLYRXJYGJNALRXOTQLSLRKJQFJYGJNGXLKQLYUZGJSXQGXSLQXNQXLVXKOJDVJNNBTKJZBKPXULYUNZXLQXUJYQGXNTYQGXKXQJKXULKQJNQNLQBYLOLKKXSJYQGXNGLUXRSBNXOFULYDSXUGJNSXDNVTYRGXUGJNLEESXLYUESLYYXUQGXNSLTDGQXKBAVBKXJYYBRXYQNQGXKXZLNYBSLRPBAVLQXKJLSOBFNGLEEXYXULSBYDXWXKFSJQQSXZGJSXQGXFRLVXQBMXXKOTQKXVLJYXUQBZGJQXZLNG&#34; We&rsquo;re given two pieces of information about the message:
- This is a simple substitution cipher: each plaintext letter is mapped onto a single ciphertext letter (e." />
+<meta property="og:description" content="My first code-breaking attempt (and success) of a ciphertext from the book The Mathematics of Secrets" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://ophirharpaz.github.io/posts/my-first-cryptanalysis/" />
+<meta property="og:image" content="https://images.unsplash.com/photo-1505074667853-caeef19244ba" />
 <meta property="article:published_time" content="2020-10-22T00:00:00+00:00" />
 <meta property="article:modified_time" content="2020-10-22T00:00:00+00:00" />
 
