@@ -6,10 +6,22 @@
     <description>Recent content on Ophir Harpaz&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 28 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 22 Oct 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://ophirharpaz.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>My First Letter-Frequency Cryptanalysis</title>
+      <link>https://ophirharpaz.github.io/posts/my-first-cryptanalysis/</link>
+      <pubDate>Thu, 22 Oct 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/my-first-cryptanalysis/</guid>
+      <description>Intro As part of my effort to get better acquainted with cryptography, I&amp;rsquo;ve started reading &amp;ldquo;The Mathematics of Secrets&amp;rdquo;, a book by Joshua Holden which aims to explain the mathematical concepts behind cryptography of both ancient and modern times.
+In its second chapter (page 31), Holden poses a challenge to the reader - deciphering a message:
+CIPHERTEXT = &amp;#34;QBVDLWXTEQGXOKTNGZJQGKXSTRQLYRXJYGJNALRXOTQLSLRKJQFJYGJNGXLKQLYUZGJSXQGXSLQXNQXLVXKOJDVJNNBTKJZBKPXULYUNZXLQXUJYQGXNTYQGXKXQJKXULKQJNQNLQBYLOLKKXSJYQGXNGLUXRSBNXOFULYDSXUGJNSXDNVTYRGXUGJNLEESXLYUESLYYXUQGXNSLTDGQXKBAVBKXJYYBRXYQNQGXKXZLNYBSLRPBAVLQXKJLSOBFNGLEEXYXULSBYDXWXKFSJQQSXZGJSXQGXFRLVXQBMXXKOTQKXVLJYXUQBZGJQXZLNG&amp;#34; We&amp;rsquo;re given two pieces of information about the message:
+ This is a simple substitution cipher: each plaintext letter is mapped onto a single ciphertext letter (e.</description>
+    </item>
     
     <item>
       <title>2 Github Accounts 1 Computer - The Shortest Guide Possible</title>

@@ -3,17 +3,22 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://ophirharpaz.github.io/posts/two-github-accounts-one-computer/</loc>
-    <lastmod>2020-08-28T00:00:00+00:00</lastmod>
+    <loc>https://ophirharpaz.github.io/posts/my-first-cryptanalysis/</loc>
+    <lastmod>2020-10-22T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ophirharpaz.github.io/</loc>
-    <lastmod>2020-08-28T00:00:00+00:00</lastmod>
+    <lastmod>2020-10-22T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ophirharpaz.github.io/posts/</loc>
+    <lastmod>2020-10-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ophirharpaz.github.io/posts/two-github-accounts-one-computer/</loc>
     <lastmod>2020-08-28T00:00:00+00:00</lastmod>
   </url>
   

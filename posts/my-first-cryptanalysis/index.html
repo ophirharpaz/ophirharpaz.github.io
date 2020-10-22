@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <title>My First Letter-Frequency Cryptanalysis // Ophir Harpaz&#39;s Blog</title>
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.69.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Ophir Harpaz" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="https://ophirharpaz.github.io/css/main.min.ae2c98d0a99ba1fcfa761cdd94c664d871f397fdc15abbe8c66dc5fb512ebe27.css" />
+    <link rel="icon" type="image/png" href="favicon.png">
+
+    
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="My First Letter-Frequency Cryptanalysis"/>
+<meta name="twitter:description" content="Intro As part of my effort to get better acquainted with cryptography, I&rsquo;ve started reading &ldquo;The Mathematics of Secrets&rdquo;, a book by Joshua Holden which aims to explain the mathematical concepts behind cryptography of both ancient and modern times.
+In its second chapter (page 31), Holden poses a challenge to the reader - deciphering a message:
+CIPHERTEXT = &#34;QBVDLWXTEQGXOKTNGZJQGKXSTRQLYRXJYGJNALRXOTQLSLRKJQFJYGJNGXLKQLYUZGJSXQGXSLQXNQXLVXKOJDVJNNBTKJZBKPXULYUNZXLQXUJYQGXNTYQGXKXQJKXULKQJNQNLQBYLOLKKXSJYQGXNGLUXRSBNXOFULYDSXUGJNSXDNVTYRGXUGJNLEESXLYUESLYYXUQGXNSLTDGQXKBAVBKXJYYBRXYQNQGXKXZLNYBSLRPBAVLQXKJLSOBFNGLEEXYXULSBYDXWXKFSJQQSXZGJSXQGXFRLVXQBMXXKOTQKXVLJYXUQBZGJQXZLNG&#34; We&rsquo;re given two pieces of information about the message:
+ This is a simple substitution cipher: each plaintext letter is mapped onto a single ciphertext letter (e."/>
+
+    <meta property="og:title" content="My First Letter-Frequency Cryptanalysis" />
+<meta property="og:description" content="Intro As part of my effort to get better acquainted with cryptography, I&rsquo;ve started reading &ldquo;The Mathematics of Secrets&rdquo;, a book by Joshua Holden which aims to explain the mathematical concepts behind cryptography of both ancient and modern times.
+In its second chapter (page 31), Holden poses a challenge to the reader - deciphering a message:
+CIPHERTEXT = &#34;QBVDLWXTEQGXOKTNGZJQGKXSTRQLYRXJYGJNALRXOTQLSLRKJQFJYGJNGXLKQLYUZGJSXQGXSLQXNQXLVXKOJDVJNNBTKJZBKPXULYUNZXLQXUJYQGXNTYQGXKXQJKXULKQJNQNLQBYLOLKKXSJYQGXNGLUXRSBNXOFULYDSXUGJNSXDNVTYRGXUGJNLEESXLYUESLYYXUQGXNSLTDGQXKBAVBKXJYYBRXYQNQGXKXZLNYBSLRPBAVLQXKJLSOBFNGLEEXYXULSBYDXWXKFSJQQSXZGJSXQGXFRLVXQBMXXKOTQKXVLJYXUQBZGJQXZLNG&#34; We&rsquo;re given two pieces of information about the message:
+ This is a simple substitution cipher: each plaintext letter is mapped onto a single ciphertext letter (e." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ophirharpaz.github.io/posts/my-first-cryptanalysis/" />
+<meta property="article:published_time" content="2020-10-22T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-10-22T00:00:00+00:00" />
+
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="https://ophirharpaz.github.io/"><img class="app-header-avatar" src="/avatar.jpg" alt="Ophir Harpaz" /></a>
+      <h1>Ophir Harpaz&#39;s Blog</h1>
+      <p>Hi, I&#39;m Ophir :) I&#39;m a security researcher at Guardicore. This blog is where I share my research &amp; findings in tech and security. Feel free to talk to me!</p>
+      <div class="app-header-social">
+        
+          <a target="_blank" href="https://twitter.com/ophirharpaz" rel="noreferrer noopener"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-twitter">
+  <title>twitter</title>
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+</svg></a>
+        
+          <a target="_blank" href="https://github.com/ophirharpaz" rel="noreferrer noopener"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-github">
+  <title>github</title>
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+</svg></a>
+        
+          <a target="_blank" href="mailto:ophirharpaz@gmail.com" rel="noreferrer noopener"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-mail">
+  <title>mail</title>
+  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline>
+</svg></a>
+        
+      </div>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">My First Letter-Frequency Cryptanalysis</h1>
+      <div class="post-meta">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          Oct 22, 2020
+        </div>
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          5 min read
+        </div></div>
+    </header>
+    <div class="post-content">
+      <h1 id="intro">Intro</h1>
+<p>As part of my effort to get better acquainted with cryptography, I&rsquo;ve started reading
+<a href="https://press.princeton.edu/books/paperback/9780691183312/the-mathematics-of-secrets">&ldquo;The Mathematics of Secrets&rdquo;</a>,
+a book by Joshua Holden which aims to explain the mathematical concepts behind cryptography of both
+ancient and modern times.</p>
+<p>In its second chapter (page 31), Holden poses a challenge to the reader - deciphering a message:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">
+CIPHERTEXT <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;QBVDLWXTEQGXOKTNGZJQGKXSTRQLYRXJYGJNALRXOTQLSLRKJQFJYGJNGXLKQLYUZGJSXQGXSLQXNQXLVXKOJDVJNNBTKJZBKPXULYUNZXLQXUJYQGXNTYQGXKXQJKXULKQJNQNLQBYLOLKKXSJYQGXNGLUXRSBNXOFULYDSXUGJNSXDNVTYRGXUGJNLEESXLYUESLYYXUQGXNSLTDGQXKBAVBKXJYYBRXYQNQGXKXZLNYBSLRPBAVLQXKJLSOBFNGLEEXYXULSBYDXWXKFSJQQSXZGJSXQGXFRLVXQBMXXKOTQKXVLJYXUQBZGJQXZLNG&#34;</span>
+
+</code></pre></div><p>We&rsquo;re given two pieces of information about the message:</p>
+<ol>
+<li>This is a <strong>simple substitution cipher</strong>: each plaintext letter is mapped onto a single ciphertext letter
+(e.g. if <code>a</code> is mapped onto <code>q</code>, then <code>a</code> in the plaintext appears as <code>q</code> in the ciphertext).</li>
+<li>There are <strong>no spaces</strong> in the original message.</li>
+</ol>
+<p>If you feel like giving it a shot without reading how I did it, go ahead :)</p>
+<h1 id="take-1---letter-frequencies">Take 1 - Letter Frequencies</h1>
+<p>Letter Frequency analysis is based on the simple fact that not all letters are equal, and some letters
+occur more frequently than others in normal text. Therefore, I set out to look for letter frequencies in
+English, and <a href="https://en.wikipedia.org/wiki/Letter_frequency">found</a> the following data &ndash; English letters
+sorted by their frequency, in descending order:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">
+english_letter_frequencies <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;e&#39;</span>, <span style="color:#e6db74">&#39;t&#39;</span>, <span style="color:#e6db74">&#39;a&#39;</span>, <span style="color:#e6db74">&#39;o&#39;</span>, <span style="color:#e6db74">&#39;i&#39;</span>, <span style="color:#e6db74">&#39;n&#39;</span>, <span style="color:#e6db74">&#39;s&#39;</span>, <span style="color:#e6db74">&#39;r&#39;</span>, <span style="color:#e6db74">&#39;h&#39;</span>, <span style="color:#e6db74">&#39;d&#39;</span>, <span style="color:#e6db74">&#39;l&#39;</span>, <span style="color:#e6db74">&#39;u&#39;</span>, <span style="color:#e6db74">&#39;c&#39;</span>, <span style="color:#e6db74">&#39;m&#39;</span>, <span style="color:#e6db74">&#39;f&#39;</span>, <span style="color:#e6db74">&#39;y&#39;</span>, <span style="color:#e6db74">&#39;w&#39;</span>, <span style="color:#e6db74">&#39;g&#39;</span>, <span style="color:#e6db74">&#39;p&#39;</span>, <span style="color:#e6db74">&#39;b&#39;</span>, <span style="color:#e6db74">&#39;v&#39;</span>, <span style="color:#e6db74">&#39;k&#39;</span>, <span style="color:#e6db74">&#39;x&#39;</span>, <span style="color:#e6db74">&#39;q&#39;</span>, <span style="color:#e6db74">&#39;j&#39;</span>, <span style="color:#e6db74">&#39;z&#39;</span>]
+
+</code></pre></div><p>Next step was to map each letter in the ciphertext to its corresponding letter in plaintext, based on
+frequency similarity (e.g. if &ldquo;e&rdquo; is the most frequent letter in English, and &ldquo;X&rdquo; appears most in our
+ciphertext, then &ldquo;X&rdquo; is likely to represent &ldquo;e&rdquo;).</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">
+letter_counts <span style="color:#f92672">=</span> Counter(CIPHERTEXT)  <span style="color:#75715e"># Counter is imported from &#34;collections&#34;</span>
+letters_by_frequency <span style="color:#f92672">=</span> sorted(letter_counts, key<span style="color:#f92672">=</span>letter_counts<span style="color:#f92672">.</span>get, reverse<span style="color:#f92672">=</span>True)  <span style="color:#75715e"># This produces a list of letters sorted by their frequency (in descending order) </span>
+rules <span style="color:#f92672">=</span> {i: j <span style="color:#66d9ef">for</span> i, j <span style="color:#f92672">in</span> zip(letters_by_frequency, english_letter_frequencies)}   <span style="color:#75715e"># This creates the ciphertext-plaintext mapping</span>
+
+<span style="color:#f92672">&gt;&gt;</span> rules
+<span style="color:#f92672">&gt;&gt;</span> {<span style="color:#e6db74">&#39;X&#39;</span>: <span style="color:#e6db74">&#39;e&#39;</span>, <span style="color:#e6db74">&#39;Q&#39;</span>: <span style="color:#e6db74">&#39;t&#39;</span>, <span style="color:#e6db74">&#39;L&#39;</span>: <span style="color:#e6db74">&#39;a&#39;</span>, <span style="color:#e6db74">&#39;G&#39;</span>: <span style="color:#e6db74">&#39;o&#39;</span>, <span style="color:#e6db74">&#39;J&#39;</span>: <span style="color:#e6db74">&#39;i&#39;</span>, <span style="color:#e6db74">&#39;Y&#39;</span>: <span style="color:#e6db74">&#39;n&#39;</span>, <span style="color:#e6db74">&#39;N&#39;</span>: <span style="color:#e6db74">&#39;s&#39;</span>, <span style="color:#e6db74">&#39;K&#39;</span>: <span style="color:#e6db74">&#39;r&#39;</span>, <span style="color:#e6db74">&#39;S&#39;</span>: <span style="color:#e6db74">&#39;h&#39;</span>, <span style="color:#e6db74">&#39;B&#39;</span>: <span style="color:#e6db74">&#39;d&#39;</span>, <span style="color:#e6db74">&#39;U&#39;</span>: <span style="color:#e6db74">&#39;l&#39;</span>, <span style="color:#e6db74">&#39;T&#39;</span>: <span style="color:#e6db74">&#39;u&#39;</span>, <span style="color:#e6db74">&#39;R&#39;</span>: <span style="color:#e6db74">&#39;c&#39;</span>, <span style="color:#e6db74">&#39;V&#39;</span>: <span style="color:#e6db74">&#39;m&#39;</span>, <span style="color:#e6db74">&#39;Z&#39;</span>: <span style="color:#e6db74">&#39;f&#39;</span>, <span style="color:#e6db74">&#39;O&#39;</span>: <span style="color:#e6db74">&#39;y&#39;</span>, <span style="color:#e6db74">&#39;D&#39;</span>: <span style="color:#e6db74">&#39;w&#39;</span>, <span style="color:#e6db74">&#39;E&#39;</span>: <span style="color:#e6db74">&#39;g&#39;</span>, <span style="color:#e6db74">&#39;F&#39;</span>: <span style="color:#e6db74">&#39;p&#39;</span>, <span style="color:#e6db74">&#39;A&#39;</span>: <span style="color:#e6db74">&#39;b&#39;</span>, <span style="color:#e6db74">&#39;W&#39;</span>: <span style="color:#e6db74">&#39;v&#39;</span>, <span style="color:#e6db74">&#39;P&#39;</span>: <span style="color:#e6db74">&#39;k&#39;</span>, <span style="color:#e6db74">&#39;M&#39;</span>: <span style="color:#e6db74">&#39;x&#39;</span>}
+
+</code></pre></div><p>To perform the actual substitution, I wrote this simple function and tried using it to decipher the message:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">substitute</span>(text, rules_dict):
+    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;&#39;</span><span style="color:#f92672">.</span>join([rules_dict<span style="color:#f92672">.</span>get(c, <span style="color:#e6db74">&#39;*&#39;</span>) <span style="color:#66d9ef">for</span> c <span style="color:#f92672">in</span> text])  <span style="color:#75715e"># If you can&#39;t find a mapping print &#34;*&#34; instead...</span>
+
+<span style="color:#f92672">&gt;&gt;</span> substitute(CIPHERTEXT, rules)
+<span style="color:#f92672">&gt;&gt;</span> tdmwaveugtoeyrusofitorehuctanceinoisbaceyutahacritpinoisoeartanlfoihetoehatesteameryiwmissdurifdrkelanlsfeatelintoesuntoeretirelartistsatdnayarrehintoesoalechdseyplanwheloishewsmuncoeloisaggheanlghanneltoeshauwoterdbmdreinndcentstoerefasndhackdbmateriahydpsoaggenelahdnweverphitthefoihetoepcametdxeeryutremaineltdfoitefaso
+
+</code></pre></div><p>The result was too disappointing to even look for words in. So with <a href="https://twitter.com/IddoYadlin">Iddo</a>&lsquo;s
+peer pressure, I went on to look at bigrams.</p>
+<h1 id="take-2---bigrams-pun-not-intended">Take 2 - Bigrams (Pun not Intended)</h1>
+<p>Bigrams are basically two-letter-blocks in the text. Just like letters, bigrams can be also counted and
+serve as the basis for frequency analysis.
+For example, in the sentence &ldquo;I think there&rsquo;s a problem there&rdquo;, the most frequent bigram is &ldquo;th&rdquo; with 3
+occurrences.</p>
+<p>The most popular bigrams in <a href="https://en.wikipedia.org/wiki/Bigram#Bigram_frequency_in_the_English_language">English</a>
+are (in descending order):</p>
+<pre><code>
+th, he, in, er, an, re, nd, at, on, nt, ha, es, st, en, ed, to, it, ou, ea, hi, is, or, ti, as, te, et, ng, of, al, de, se, le, sa, si, ar, ve, ra, ld, ur
+
+</code></pre><p>and in our ciphertext, these are:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">
+bigram_counts <span style="color:#f92672">=</span> Counter(CIPHERTEXT[i:i <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>] <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(CIPHERTEXT)<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>))
+bigrams_by_frequency <span style="color:#f92672">=</span> sorted(bigram_counts, key<span style="color:#f92672">=</span>bigram_counts<span style="color:#f92672">.</span>get, reverse<span style="color:#f92672">=</span>True)
+
+<span style="color:#f92672">&gt;&gt;</span> bigrams_by_frequency
+<span style="color:#f92672">&gt;&gt;</span> [<span style="color:#e6db74">&#39;GX&#39;</span>, <span style="color:#e6db74">&#39;QG&#39;</span>, <span style="color:#e6db74">&#39;XU&#39;</span>, <span style="color:#e6db74">&#39;KX&#39;</span>, <span style="color:#e6db74">&#39;GJ&#39;</span>, <span style="color:#e6db74">&#39;XK&#39;</span>, <span style="color:#e6db74">&#39;LY&#39;</span>, <span style="color:#e6db74">&#39;JY&#39;</span>, <span style="color:#e6db74">&#39;JN&#39;</span>, <span style="color:#e6db74">&#39;SX&#39;</span>, <span style="color:#e6db74">&#39;QX&#39;</span>, <span style="color:#e6db74">&#39;NG&#39;</span>, <span style="color:#e6db74">&#39;SL&#39;</span>, <span style="color:#e6db74">&#39;QB&#39;</span>, <span style="color:#e6db74">&#39;JQ&#39;</span>, <span style="color:#e6db74">&#39;XL&#39;</span>, <span style="color:#e6db74">&#39;XQ&#39;</span>, <span style="color:#e6db74">&#39;LQ&#39;</span>, <span style="color:#e6db74">&#39;XN&#39;</span>, <span style="color:#e6db74">&#39;UL&#39;</span>, <span style="color:#e6db74">&#39;YQ&#39;</span>, <span style="color:#e6db74">&#39;XO&#39;</span>, <span style="color:#e6db74">&#39;XS&#39;</span> <span style="color:#f92672">...</span>]
+
+</code></pre></div><h2 id="head-scratching--manual-work">Head Scratching &amp; Manual Work</h2>
+<p>The most popular bigram in our text is &ldquo;GX&rdquo;. But according to my letter frequency analysis (take 1), this
+is translated into &ldquo;oe&rdquo; in plaintext, which is highly improbable given that &ldquo;oe&rdquo; is quite rare in English.</p>
+<p>In addition,</p>
+<ul>
+<li>the two most frequent bigrams in English are &ldquo;th&rdquo; and &ldquo;he&rdquo;;</li>
+<li>the two most frequent bigrams in the cipher are &ldquo;GX&rdquo; and &ldquo;QG&rdquo;</li>
+</ul>
+<p>The letter frequency analysis mapped <code>X</code> to <code>e</code> and <code>Q</code> to <code>t</code>. If this mapping is correct, then <code>G</code>
+should be mapped to <code>h</code>.</p>
+<p>With this small fix, I performed substitution again:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">
+rules[<span style="color:#e6db74">&#39;G&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;h&#39;</span>
+<span style="color:#66d9ef">del</span> rules[<span style="color:#e6db74">&#39;S&#39;</span>]   <span style="color:#75715e"># remove the rule that originally mapped to &#34;h&#34;</span>
+
+<span style="color:#f92672">&gt;&gt;</span> substitute(CIPHERTEXT, rules)
+<span style="color:#f92672">&gt;&gt;</span> tdmwaveugtheyrushfithre<span style="color:#f92672">*</span>uctanceinhisbaceyuta<span style="color:#f92672">*</span>acritpinhisheartanlfhi<span style="color:#f92672">*</span>ethe<span style="color:#f92672">*</span>atesteameryiwmissdurifdrkelanlsfeatelinthesuntheretirelartistsatdnayarre<span style="color:#f92672">*</span>intheshalec<span style="color:#f92672">*</span>dseyplanw<span style="color:#f92672">*</span>elhis<span style="color:#f92672">*</span>ewsmunchelhisagg<span style="color:#f92672">*</span>eanlg<span style="color:#f92672">*</span>annelthes<span style="color:#f92672">*</span>auwhterdbmdreinndcentstherefasnd<span style="color:#f92672">*</span>ackdbmateria<span style="color:#f92672">*</span>ydpshaggenela<span style="color:#f92672">*</span>dnweverp<span style="color:#f92672">*</span>itt<span style="color:#f92672">*</span>efhi<span style="color:#f92672">*</span>ethepcametdxeeryutremaineltdfhitefash
+
+</code></pre></div><p>This time I stared longer at the result. Its ending, &ldquo;fhitefash&rdquo;, made me think that this <code>f</code> should be
+a <code>w</code>, to render &ldquo;whitewash&rdquo; instead.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">
+rules[<span style="color:#e6db74">&#39;Z&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;w&#39;</span>  <span style="color:#75715e"># &#34;Z&#34; originally went to &#34;f&#34;, it should translate to &#34;w&#34;</span>
+<span style="color:#66d9ef">del</span> rules[<span style="color:#e6db74">&#39;D&#39;</span>]    <span style="color:#75715e"># remove the rule that originally went to &#34;w&#34;</span>
+
+<span style="color:#f92672">&gt;&gt;</span> substitute(CIPHERTEXT, rules)
+<span style="color:#f92672">&gt;&gt;</span> tdm<span style="color:#f92672">*</span>aveugtheyrushwithre<span style="color:#f92672">*</span>uctanceinhisbaceyuta<span style="color:#f92672">*</span>acritpinhisheartanlwhi<span style="color:#f92672">*</span>ethe<span style="color:#f92672">*</span>atesteameryi<span style="color:#f92672">*</span>missduriwdrkelanlsweatelinthesuntheretirelartistsatdnayarre<span style="color:#f92672">*</span>intheshalec<span style="color:#f92672">*</span>dseyplan<span style="color:#f92672">**</span>elhis<span style="color:#f92672">*</span>e<span style="color:#f92672">*</span>smunchelhisagg<span style="color:#f92672">*</span>eanlg<span style="color:#f92672">*</span>annelthes<span style="color:#f92672">*</span>au<span style="color:#f92672">*</span>hterdbmdreinndcentstherewasnd<span style="color:#f92672">*</span>ackdbmateria<span style="color:#f92672">*</span>ydpshaggenela<span style="color:#f92672">*</span>dn<span style="color:#f92672">*</span>everp<span style="color:#f92672">*</span>itt<span style="color:#f92672">*</span>ewhi<span style="color:#f92672">*</span>ethepcametdxeeryutremaineltdwhitewash
+
+</code></pre></div><p>Yet again, a substring from the end of the plaintext gave me more clues.</p>
+<p>&ldquo;<code>everp*itt*ewhi*ethepcame</code>&rdquo; looked to me like &ldquo;every little while they came&rdquo;, which meant that:</p>
+<ul>
+<li>whatever maps to &ldquo;p&rdquo; should map to &ldquo;y&rdquo; instead;</li>
+<li>a missing letter in my rules dictionary (which I found was &ldquo;S&rdquo;) should go to &ldquo;l&rdquo;.</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">
+rules[<span style="color:#e6db74">&#39;F&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;y&#39;</span>  <span style="color:#75715e"># &#34;F&#34; origianlly went to &#34;p&#34;, should go to &#34;y&#34;</span>
+rules[<span style="color:#e6db74">&#39;S&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;l&#39;</span>  <span style="color:#75715e"># &#34;S&#34; is the ciphertext letter where all the &#34;l&#34;s should appear</span>
+<span style="color:#66d9ef">del</span> rules[<span style="color:#e6db74">&#39;O&#39;</span>]    <span style="color:#75715e"># remove the rule that originally went to &#34;y&#34;</span>
+
+<span style="color:#f92672">&gt;&gt;</span> substitute(CIPHERTEXT, rules)
+<span style="color:#f92672">&gt;&gt;</span> tdm<span style="color:#f92672">*</span>aveugthe<span style="color:#f92672">*</span>rushwithreluctanceinhisbace<span style="color:#f92672">*</span>utalacrityinhisheartanlwhilethelatesteamer<span style="color:#f92672">*</span>i<span style="color:#f92672">*</span>missduriwdrkelanlsweatelinthesuntheretirelartistsatdna<span style="color:#f92672">*</span>arrelintheshalecldse<span style="color:#f92672">*</span>ylan<span style="color:#f92672">*</span>lelhisle<span style="color:#f92672">*</span>smunchelhisaggleanlglanneltheslau<span style="color:#f92672">*</span>hterdbmdreinndcentstherewasndlackdbmaterial<span style="color:#f92672">*</span>dyshaggenelaldn<span style="color:#f92672">*</span>everylittlewhiletheycametdxeer<span style="color:#f92672">*</span>utremaineltdwhitewash
+
+</code></pre></div><h2 id="enough-is-enough---spoiler-">Enough is Enough - Spoiler ⚠️</h2>
+<p>At that point, the deciphered text was not yet perfect but contained enough readable parts to
+perform a Google search. &ldquo;with reluctance in his&rdquo;, &ldquo;alacrity in his heart&rdquo; and &ldquo;while the late steamer&rdquo;
+are just a couple of examples of such substrings which eventually brought me to Mark Twain&rsquo;s
+<a href="http://www.literaturepage.com/read/tomsawyer-15.html">Tom Sawyer</a>:</p>
+<blockquote>
+<p>Tom gave up the brush with reluctance in his face, but alacrity in his heart. And while the late steamer Big Missouri worked and sweated in the sun, the retired artist sat on a barrel in the shade close by, dangled his legs, munched his apple, and planned the slaughter of more innocents. There was no lack of material; boys happened along every little while; they came to jeer, but remained to whitewash.</p>
+</blockquote>
+<h1 id="final-solution">Final Solution</h1>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">
+final_rules <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;X&#39;</span>: <span style="color:#e6db74">&#39;e&#39;</span>, <span style="color:#e6db74">&#39;Q&#39;</span>: <span style="color:#e6db74">&#39;t&#39;</span>, <span style="color:#e6db74">&#39;L&#39;</span>: <span style="color:#e6db74">&#39;a&#39;</span>, <span style="color:#e6db74">&#39;G&#39;</span>: <span style="color:#e6db74">&#39;h&#39;</span>, <span style="color:#e6db74">&#39;J&#39;</span>: <span style="color:#e6db74">&#39;i&#39;</span>, <span style="color:#e6db74">&#39;Y&#39;</span>: <span style="color:#e6db74">&#39;n&#39;</span>, <span style="color:#e6db74">&#39;N&#39;</span>: <span style="color:#e6db74">&#39;s&#39;</span>, <span style="color:#e6db74">&#39;K&#39;</span>: <span style="color:#e6db74">&#39;r&#39;</span>, <span style="color:#e6db74">&#39;S&#39;</span>: <span style="color:#e6db74">&#39;l&#39;</span>, <span style="color:#e6db74">&#39;B&#39;</span>: <span style="color:#e6db74">&#39;o&#39;</span>,
+               <span style="color:#e6db74">&#39;U&#39;</span>: <span style="color:#e6db74">&#39;d&#39;</span>, <span style="color:#e6db74">&#39;T&#39;</span>: <span style="color:#e6db74">&#39;u&#39;</span>, <span style="color:#e6db74">&#39;R&#39;</span>: <span style="color:#e6db74">&#39;c&#39;</span>, <span style="color:#e6db74">&#39;V&#39;</span>: <span style="color:#e6db74">&#39;m&#39;</span>, <span style="color:#e6db74">&#39;Z&#39;</span>: <span style="color:#e6db74">&#39;w&#39;</span>, <span style="color:#e6db74">&#39;O&#39;</span>: <span style="color:#e6db74">&#39;b&#39;</span>, <span style="color:#e6db74">&#39;D&#39;</span>: <span style="color:#e6db74">&#39;g&#39;</span>, <span style="color:#e6db74">&#39;E&#39;</span>: <span style="color:#e6db74">&#39;p&#39;</span>, <span style="color:#e6db74">&#39;F&#39;</span>: <span style="color:#e6db74">&#39;y&#39;</span>, <span style="color:#e6db74">&#39;A&#39;</span>: <span style="color:#e6db74">&#39;f&#39;</span>,
+               <span style="color:#e6db74">&#39;W&#39;</span>: <span style="color:#e6db74">&#39;v&#39;</span>, <span style="color:#e6db74">&#39;P&#39;</span>: <span style="color:#e6db74">&#39;k&#39;</span>, <span style="color:#e6db74">&#39;M&#39;</span>: <span style="color:#e6db74">&#39;x&#39;</span>}
+<span style="color:#f92672">&gt;&gt;</span> substitute(CIPHERTEXT, final_rules)
+<span style="color:#f92672">&gt;&gt;</span> tomgaveupthebrushwithreluctanceinhisfacebutalacrityinhisheartandwhilethelatesteamerbigmissouriworkedandsweatedinthesuntheretiredartistsatonabarrelintheshadeclosebydangledhislegsmunchedhisappleandplannedtheslaughterofmoreinnocentstherewasnolackofmaterialboyshappenedalongeverylittlewhiletheycametoxeerbutremainedtowhitewash
+
+</code></pre></div><p>As an anecdote, the initial letter frequency analysis produced a substitution rule which was 10 units distant
+from the correct rule.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">
+<span style="color:#f92672">&gt;&gt;</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+<span style="color:#f92672">..</span> <span style="color:#66d9ef">for</span> k, v <span style="color:#f92672">in</span> rules<span style="color:#f92672">.</span>items():
+<span style="color:#f92672">..</span>     i <span style="color:#f92672">=</span> i<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span> <span style="color:#66d9ef">if</span> v <span style="color:#f92672">!=</span> final_rules[k] <span style="color:#66d9ef">else</span> i
+<span style="color:#f92672">&gt;&gt;</span> i
+<span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">10</span>
+
+</code></pre></div>
+    </div>
+    <div class="post-footer">
+      
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>
