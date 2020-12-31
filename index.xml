@@ -6,10 +6,20 @@
     <description>Recent content on Ophir Harpaz&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 22 Oct 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 30 Dec 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://ophirharpaz.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>My Twenty-Twenty in Tweets</title>
+      <link>https://ophirharpaz.github.io/posts/my-twenty-twenty-in-tweets/</link>
+      <pubDate>Wed, 30 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ophirharpaz.github.io/posts/my-twenty-twenty-in-tweets/</guid>
+      <description>This blog post is the result of me scrolling through my Twitter feed from the past year. I’m linking to way too many tweets, so just click on the ones you’re curious about. The topics I’ll touch revolve around impostor syndrome, frustration, motivation and community. I hope you find value in going through my happy and tough moments of 2020.
+Impostor Syndrome and Frustration 2019 ended up with me having another instance of impostor syndrome.</description>
+    </item>
     
     <item>
       <title>My First Letter-Frequency Cryptanalysis</title>
