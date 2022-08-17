@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://ophirharpaz.github.io/css/main.min.ae2c98d0a99ba1fcfa761cdd94c664d871f397fdc15abbe8c66dc5fb512ebe27.css" />
     <link rel="icon" type="image/png" href="favicon.png">
 
-    
+
     <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Using Peewee&#39;s Expression to Perform Array Operations"/>
 <meta name="twitter:description" content="This is a story about problem solving. True, it involves Python and database code, but eventually what I&rsquo;m describing is running into a problem, understanding its root cause and finding a creative way to solve it.
@@ -34,39 +34,39 @@ Entities &amp; Schema For the sake of simplicity, we&rsquo;ll be talking about B
       <h1>Ophir Harpaz&#39;s Blog</h1>
       <p>Hi, I&#39;m Ophir :) I&#39;m a security researcher at Guardicore. This blog is where I share my research &amp; findings in tech and security. Feel free to talk to me!</p>
       <div class="app-header-social">
-        
-          <a target="_blank" href="https://twitter.com/ophirharpaz" rel="noreferrer noopener"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-twitter">
+
+          <a target="_blank" href="https://twitter.com/ophirharpaz" rel="noreferrer noopener"><svg xmlns="https//www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-twitter">
   <title>twitter</title>
   <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
 </svg></a>
-        
-          <a target="_blank" href="https://github.com/ophirharpaz" rel="noreferrer noopener"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-github">
+
+          <a target="_blank" href="https://github.com/ophirharpaz" rel="noreferrer noopener"><svg xmlns="https//www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-github">
   <title>github</title>
   <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
 </svg></a>
-        
-          <a target="_blank" href="mailto:ophirharpaz@gmail.com" rel="noreferrer noopener"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-mail">
+
+          <a target="_blank" href="mailto:ophirharpaz@gmail.com" rel="noreferrer noopener"><svg xmlns="https//www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-mail">
   <title>mail</title>
   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline>
 </svg></a>
-        
+
       </div>
     </header>
     <main class="app-container">
-      
+
   <article class="post">
     <header class="post-header">
       <h1 class ="post-title">Using Peewee&#39;s Expression to Perform Array Operations</h1>
       <div class="post-meta">
         <div>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+          <svg xmlns="https//www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
   <title>calendar</title>
   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
 </svg>
           Dec 27, 2019
         </div>
         <div>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+          <svg xmlns="https//www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
   <title>clock</title>
   <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
 </svg>
@@ -109,7 +109,7 @@ one book.</p>
 </tr>
 </tbody>
 </table>
-<p>The database code is written in <a href="http://docs.peewee-orm.com/en/latest/">Peewee</a>.
+<p>The database code is written in <a href="https//docs.peewee-orm.com/en/latest/">Peewee</a>.
 Peewee is an ORM library in Python, which means it converts data from certain SQL databases (PostgreSQL is among them)
 to Python objects and vice versa.
 When you query the database, you do it by writing object-oriented code instead of raw SQL statements.</p>
@@ -150,16 +150,16 @@ subquery <span style="color:#f92672">=</span> BookToAuthor<span style="color:#f9
     fn<span style="color:#f92672">.</span>ARRAY_AGG(Book<span style="color:#f92672">.</span>author_id<span style="color:#f92672">.</span>distinct())<span style="color:#f92672">.</span>alias(<span style="color:#e6db74">&#39;author_ids&#39;</span>))<span style="color:#f92672">.</span>group_by(Book<span style="color:#f92672">.</span>book_id)
 
 </code></pre></div><p>In SQL, this translates into:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> book_id, 
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> book_id,
        ARRAY_AGG(<span style="color:#66d9ef">DISTINCT</span> author_id) <span style="color:#66d9ef">AS</span> author_ids
 <span style="color:#66d9ef">FROM</span> BookToAuthor
 </code></pre></div><p>This would return an aggregated array of author IDs per book.</p>
 <p>Now the code for the whole process. Before reading it, notice that:</p>
 <ul>
 <li>The <code>certain_authors</code> variable is a list of the author IDs I&rsquo;m interested in, say [6, 9].</li>
-<li>The <code>.c</code> operator is Peewee&rsquo;s <a href="http://docs.peewee-orm.com/en/latest/peewee/query_builder.html#select-queries">way</a>
+<li>The <code>.c</code> operator is Peewee&rsquo;s <a href="https//docs.peewee-orm.com/en/latest/peewee/query_builder.html#select-queries">way</a>
 of accessing a subquery result&rsquo;s column.</li>
-<li><code>contains</code> is a Peewee <a href="http://docs.peewee-orm.com/en/latest/peewee/playhouse.html#ArrayField.contains">method</a>
+<li><code>contains</code> is a Peewee <a href="https//docs.peewee-orm.com/en/latest/peewee/playhouse.html#ArrayField.contains">method</a>
 that enables to test if a database array contains the given elements.</li>
 </ul>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># First-Level Query</span>
@@ -183,13 +183,13 @@ LINE <span style="color:#ae81ff">1</span>: <span style="color:#f92672">...=</spa
 HINT:  No operator matches the given name <span style="color:#f92672">and</span> argument types<span style="color:#f92672">.</span> You might need to add explicit type casts<span style="color:#f92672">.</span>
 </code></pre></div><p><strong>Peewee was using <code>ILIKE</code> <em>string</em> operator. It was not treating <code>author_ids</code> as an array</strong>.</p>
 <p>Using Peewee&rsquo;s <code>.sql()</code> method, I could confirm this by seeing the full query to which my code was translated:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> t1.book_id 
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> t1.book_id
 <span style="color:#66d9ef">FROM</span> BookToAuthor <span style="color:#66d9ef">AS</span> t1
-<span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> (<span style="color:#66d9ef">SELECT</span> t1.book_id, 
-                   ARRAY_AGG(<span style="color:#66d9ef">DISTINCT</span> x.author_id) <span style="color:#66d9ef">AS</span> author_ids 
-            <span style="color:#66d9ef">FROM</span> BookToAuthor <span style="color:#66d9ef">AS</span> t1 
-            <span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> t1.book_id) <span style="color:#66d9ef">AS</span> t2 
-      <span style="color:#66d9ef">ON</span> (t2.book_id <span style="color:#f92672">=</span> t1.book_id) 
+<span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> (<span style="color:#66d9ef">SELECT</span> t1.book_id,
+                   ARRAY_AGG(<span style="color:#66d9ef">DISTINCT</span> x.author_id) <span style="color:#66d9ef">AS</span> author_ids
+            <span style="color:#66d9ef">FROM</span> BookToAuthor <span style="color:#66d9ef">AS</span> t1
+            <span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> t1.book_id) <span style="color:#66d9ef">AS</span> t2
+      <span style="color:#66d9ef">ON</span> (t2.book_id <span style="color:#f92672">=</span> t1.book_id)
 <span style="color:#66d9ef">WHERE</span> t2.author_ids <span style="color:#66d9ef">ILIKE</span> <span style="color:#e6db74">&#39;%&lt;certain_authors&gt;%&#39;</span>
 </code></pre></div><p>It was time to see why Peewee chose a string operator - a case-insensitive string match - instead of array-contains.</p>
 <h3 id="debugging">Debugging</h3>
@@ -246,12 +246,12 @@ expression:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e"># Only the relevant line-of-code from before...</span>
 array_equals(subquery<span style="color:#f92672">.</span>c<span style="color:#f92672">.</span>author_ids, SQL(<span style="color:#e6db74">&#39;ARRAY{}&#39;</span><span style="color:#f92672">.</span>format(certain_authors)))
 </code></pre></div><p>This was a hacky solution, but it produced my oh-so-desired SQL query:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> t1.book_id 
-<span style="color:#66d9ef">FROM</span> BookToAuthor <span style="color:#66d9ef">AS</span> t1 
-<span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> (<span style="color:#66d9ef">SELECT</span> t1.book_id, 
-                   ARRAY_AGG(<span style="color:#66d9ef">DISTINCT</span> t1.author_id) <span style="color:#66d9ef">AS</span> author_ids 
-                   <span style="color:#66d9ef">FROM</span> BookToAuthor <span style="color:#66d9ef">AS</span> t1 
-                   <span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> t1.book_id) <span style="color:#66d9ef">AS</span> t2 
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> t1.book_id
+<span style="color:#66d9ef">FROM</span> BookToAuthor <span style="color:#66d9ef">AS</span> t1
+<span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> (<span style="color:#66d9ef">SELECT</span> t1.book_id,
+                   ARRAY_AGG(<span style="color:#66d9ef">DISTINCT</span> t1.author_id) <span style="color:#66d9ef">AS</span> author_ids
+                   <span style="color:#66d9ef">FROM</span> BookToAuthor <span style="color:#66d9ef">AS</span> t1
+                   <span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> t1.book_id) <span style="color:#66d9ef">AS</span> t2
       <span style="color:#66d9ef">ON</span> (t2.book_id <span style="color:#f92672">=</span> t1.book_id)
 <span style="color:#66d9ef">WHERE</span> (t2.author_ids <span style="color:#f92672">@&gt;</span> ARRAY[<span style="color:#ae81ff">6</span>, <span style="color:#ae81ff">9</span>])<span style="color:#e6db74">&#39;
 </span></code></pre></div><p>My almost-victory was now a victory.</p>
@@ -279,7 +279,7 @@ But this was what I intended to do as a last resort.</p>
 
     </div>
     <div class="post-footer">
-      
+
     </div>
   </article>
   <script>
@@ -305,10 +305,10 @@ But this was what I intended to do as a last resort.</p>
 "cutest word":"You've never written a cooler commit message than the one I just wrote and which contained the word 'cronjobable'",
 "typedef":"This short post on C typedef and const is the cutest thing I read today. I just love C peculiarities :)",
 "assembly":"TIL that shift instructions store the pushed bits into the carry flag. This allows, for example, to efficiently check the parity of a number before it's shifted right by one bit; if it was an odd number, the carry flag will be set and we can branch accordingly with, say, JNC.",
-"hardware":"I just broke an SSD nand chip. Honestly, I can't believe this tiny piece of material stores data. Hardware adventures with @ace__pace", 
+"hardware":"I just broke an SSD nand chip. Honestly, I can't believe this tiny piece of material stores data. Hardware adventures with @ace__pace",
 "switch":"TIL how switch statements are handled by the compiler (well, one way). The compiler generates a table of value-label pairs - possible values the expression we 'switch on' can take, and labels to jump to, accordingly. [1/3] @Dafna_Mordechai",
 "assignment":"TIL with @Dafna_Mordechai  Crown that (a=b)=c compiles in C++ but not in C. That's because in C, a=b returns the value of b (which can't be assigned anything), whereas in C++, a=b returns a reference to a (an 'l-value') - which can be used in the second assignment. #trivia",
-"WiFi on a plane":"The most important URL I will ever memorize is http://msftconnect.com. This way, even if my stupid phone doesn't auto-launch the browser to connect to the WiFi, I can open it myself.",
+"WiFi on a plane":"The most important URL I will ever memorize is https//msftconnect.com. This way, even if my stupid phone doesn't auto-launch the browser to connect to the WiFi, I can open it myself.",
 "phrasing":"Nothing demotivates me more than a badly-phrased research question. I find it extremely important to state my tasks in a clear, non-ambiguous way.",
 "layout":"Sometimes, quite weirdly, the layout has tremendous effect. I once had a task-list on Google docs which felt *completely different* and more thrilling once converted into a Google sheet. I can't explain it, that's just what it was :)",
 "crucial":"#NoteToSelf If something works and you're just too happy to write down what you did to make it work - write down what you did to make it work.",
@@ -348,7 +348,7 @@ But this was what I intended to do as a last resort.</p>
 "useless GIFs":"I totally just created a gif that will serve myself and my study-partner and no one else. Oh well",
 "talking":"'Life begins at the end of your comfort zone'. Giving talks in public conferences is scary, but it's a major career progress. Yesterday, 40 @Baot_IL members wrote their first abstracts and I was there to witness. Will 2020 have more tech female speakers on stage? Yes, I think so.",
 "drinking":"Conversations at @Guardicore be like",
-"buddies":"This is exactly how this week should end. Mixin it at @Guardicore", 
+"buddies":"This is exactly how this week should end. Mixin it at @Guardicore",
 "tempt":"Romantic is when your TL invites you to a binary exploitation remote session. @liadmord #JustKidding #WeAreBothKindaMarried",
 "obsessed":"I feel lucky to have friends who are as obsessive as I am with finding answers to the most non-critical questions. Friends who are so eager to reach a solution, they send me WhatsApp messages because I haven't replied on Slack for 45 seconds. yes @liadmord  I'm talking about you",
 "stubborn":"I love how with @MatalonMor we can solve a CTF challenge in 2.5 minutes but then spend another 3 hours on understanding to the bit level why the integer overflow was triggered in the first place. Aaaaahhhh satisfaction",
@@ -358,7 +358,7 @@ But this was what I intended to do as a last resort.</p>
 "Golang":"Twitter produces fun and spontaneous tech collaborations",
 "Rust":"This tweet came just in time and put a big, big smile on my face. Python, Golang, Rust, Kotlin, what's next?",
 "Kotlin":"My dear boyfriend @IddoYadlin had an idea that we both develop HexDec for #Android. Well, he ended up doing this by himself, asking me for only graphics... So I guess HexDec now has implementations in 4 languages and an actual GUI. Sweeeeet. Link to source is in the thread.",
-"wrote up":"Really glad to see new content created around http://begin.re with more up-to-date tools ;)",
+"wrote up":"Really glad to see new content created around https//begin.re with more up-to-date tools ;)",
 "begin.re":"",
 "stared":"I think I'm being dumbstruck by C's switch-case construct in this very moment.",
 "ask out loud":"In case you wonder, this prints 'Case 1'. Anyone has a decent explanation? :(",

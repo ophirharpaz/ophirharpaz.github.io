@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://ophirharpaz.github.io/css/main.min.ae2c98d0a99ba1fcfa761cdd94c664d871f397fdc15abbe8c66dc5fb512ebe27.css" />
     <link rel="icon" type="image/png" href="favicon.png">
 
-    
+
     <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="How Does SSH Port Forwarding Work?"/>
 <meta name="twitter:description" content="I often use the command ssh server_addr -L localport:remoteaddr:remoteport to create an SSH tunnel. This allows me, for example, to communicate with a host that is only accessible to the SSH server. You can read more about SSH port forwarding (also known as &ldquo;tunneling&rdquo;) here. This blog post assumes this knowledge.
@@ -32,39 +32,39 @@ But what happens behind the scenes when the above-mentioned command is executed?
       <h1>Ophir Harpaz&#39;s Blog</h1>
       <p>Hi, I&#39;m Ophir :) I&#39;m a security researcher at Guardicore. This blog is where I share my research &amp; findings in tech and security. Feel free to talk to me!</p>
       <div class="app-header-social">
-        
-          <a target="_blank" href="https://twitter.com/ophirharpaz" rel="noreferrer noopener"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-twitter">
+
+          <a target="_blank" href="https://twitter.com/ophirharpaz" rel="noreferrer noopener"><svg xmlns="https//www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-twitter">
   <title>twitter</title>
   <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
 </svg></a>
-        
-          <a target="_blank" href="https://github.com/ophirharpaz" rel="noreferrer noopener"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-github">
+
+          <a target="_blank" href="https://github.com/ophirharpaz" rel="noreferrer noopener"><svg xmlns="https//www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-github">
   <title>github</title>
   <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
 </svg></a>
-        
-          <a target="_blank" href="mailto:ophirharpaz@gmail.com" rel="noreferrer noopener"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-mail">
+
+          <a target="_blank" href="mailto:ophirharpaz@gmail.com" rel="noreferrer noopener"><svg xmlns="https//www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-mail">
   <title>mail</title>
   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline>
 </svg></a>
-        
+
       </div>
     </header>
     <main class="app-container">
-      
+
   <article class="post">
     <header class="post-header">
       <h1 class ="post-title">How Does SSH Port Forwarding Work?</h1>
       <div class="post-meta">
         <div>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+          <svg xmlns="https//www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
   <title>calendar</title>
   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
 </svg>
           Apr 9, 2020
         </div>
         <div>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+          <svg xmlns="https//www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
   <title>clock</title>
   <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
 </svg>
@@ -149,8 +149,8 @@ This function iterates on all TCP forwarding entries that were previously added 
 </code></pre></div><p>The function <code>cli_localtcp()</code> creates a <code>TCPListener</code> entry. This entry specifies not only the forwarding details,
 but also the type of the channel that should be created (<em>cli_chan_tcplocal</em>) and the TCP type (<em>direct</em>).
 For each new TCP listener, it calls <code>listen_tcpfwd()</code>.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">cli_localtcp</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> listenaddr, 
-        <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> listenport, 
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">cli_localtcp</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> listenaddr,
+        <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> listenport,
         <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> remoteaddr,
         <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> remoteport) {
 
@@ -159,7 +159,7 @@ For each new TCP listener, it calls <code>listen_tcpfwd()</code>.</p>
 
     tcpinfo <span style="color:#f92672">=</span> (<span style="color:#66d9ef">struct</span> TCPListener<span style="color:#f92672">*</span>)m_malloc(<span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">struct</span> TCPListener));
 
-    <span style="color:#75715e">/* Assign the listening address &amp; port, 
+    <span style="color:#75715e">/* Assign the listening address &amp; port,
 </span><span style="color:#75715e">       and the remote address &amp; port*/</span>
     tcpinfo<span style="color:#f92672">-&gt;</span>sendaddr <span style="color:#f92672">=</span> m_strdup(remoteaddr);
     tcpinfo<span style="color:#f92672">-&gt;</span>sendport <span style="color:#f92672">=</span> remoteport;
@@ -206,13 +206,13 @@ Each listener is constructed with the sockets that <code>dropbear_listen()</code
 	<span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> errstring <span style="color:#f92672">=</span> NULL;
 
 	snprintf(portstring, <span style="color:#66d9ef">sizeof</span>(portstring), <span style="color:#e6db74">&#34;%u&#34;</span>, tcpinfo<span style="color:#f92672">-&gt;</span>listenport);
-	
+
 	<span style="color:#75715e">/* Create sockets and listen on them */</span>
-	nsocks <span style="color:#f92672">=</span> dropbear_listen(tcpinfo<span style="color:#f92672">-&gt;</span>listenaddr, portstring, socks, 
+	nsocks <span style="color:#f92672">=</span> dropbear_listen(tcpinfo<span style="color:#f92672">-&gt;</span>listenaddr, portstring, socks,
 			DROPBEAR_MAX_SOCKS, <span style="color:#f92672">&amp;</span>errstring, <span style="color:#f92672">&amp;</span>ses.maxfd);
 	...
 	<span style="color:#75715e">/* Put the list of sockets in a new Listener object */</span>
-	listener <span style="color:#f92672">=</span> new_listener(socks, nsocks, CHANNEL_ID_TCPFORWARDED, tcpinfo, 
+	listener <span style="color:#f92672">=</span> new_listener(socks, nsocks, CHANNEL_ID_TCPFORWARDED, tcpinfo,
 			tcp_acceptor, cleanup_tcp);
 	...
 }
@@ -247,7 +247,7 @@ and puts them inside the payload to be sent.</p>
             <span style="color:#75715e">/* host to connect, port to connect */</span>
             addr <span style="color:#f92672">=</span> tcpinfo<span style="color:#f92672">-&gt;</span>sendaddr;
             port <span style="color:#f92672">=</span> tcpinfo<span style="color:#f92672">-&gt;</span>sendport;
-        } 
+        }
         ...
         <span style="color:#75715e">/* remote ip and port */</span>
         buf_putstring(ses.writepayload, addr, strlen(addr));
@@ -271,30 +271,30 @@ named <code>newtcpdirect()</code>.</p>
     ...
     <span style="color:#75715e">/* get the packet contents */</span>
     type <span style="color:#f92672">=</span> buf_getstring(ses.payload, <span style="color:#f92672">&amp;</span>typelen);
-    
+
     remotechan <span style="color:#f92672">=</span> buf_getint(ses.payload);
     ...
-    
+
     <span style="color:#75715e">/* The server finds out the type of the client&#39;s channel,
 </span><span style="color:#75715e">       to create a channel of the same type (&#34;direct-tcpip&#34;) */</span>
-    <span style="color:#66d9ef">for</span> (cp <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>ses.chantypes[<span style="color:#ae81ff">0</span>], chantype <span style="color:#f92672">=</span> (<span style="color:#f92672">*</span>cp);  
+    <span style="color:#66d9ef">for</span> (cp <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>ses.chantypes[<span style="color:#ae81ff">0</span>], chantype <span style="color:#f92672">=</span> (<span style="color:#f92672">*</span>cp);
             chantype <span style="color:#f92672">!=</span> NULL;
             cp<span style="color:#f92672">++</span>, chantype <span style="color:#f92672">=</span> (<span style="color:#f92672">*</span>cp)) {
         <span style="color:#66d9ef">if</span> (strcmp(type, chantype<span style="color:#f92672">-&gt;</span>name) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
             <span style="color:#66d9ef">break</span>;
         }
     }
-    
+
     <span style="color:#75715e">/* create the channel */</span>
     channel <span style="color:#f92672">=</span> newchannel(remotechan, chantype, transwindow, transmaxpacket);
     ...
-    
+
         <span style="color:#75715e">/* This is where newtcpdirect is called */</span>
     <span style="color:#66d9ef">if</span> (channel<span style="color:#f92672">-&gt;</span>type<span style="color:#f92672">-&gt;</span>inithandler) {
         ret <span style="color:#f92672">=</span> channel<span style="color:#f92672">-&gt;</span>type<span style="color:#f92672">-&gt;</span>inithandler(channel);
         ...
     }
-    ...	
+    ...
     send_msg_channel_open_confirmation(channel, channel<span style="color:#f92672">-&gt;</span>recvwindow,
             channel<span style="color:#f92672">-&gt;</span>recvmaxpacket);
     ...
@@ -313,7 +313,7 @@ With these details, the server connects to the remote host and port with
 	...
 	origport <span style="color:#f92672">=</span> buf_getint(ses.payload);
 	snprintf(portstring, <span style="color:#66d9ef">sizeof</span>(portstring), <span style="color:#e6db74">&#34;%u&#34;</span>, destport);
-	
+
 	<span style="color:#75715e">/* Connect to the remote host */</span>
 	channel<span style="color:#f92672">-&gt;</span>conn_pending <span style="color:#f92672">=</span> connect_remote(desthost, portstring, channel_connect_done, channel, NULL, NULL);
 	...
@@ -322,7 +322,7 @@ With these details, the server connects to the remote host and port with
 and port, a &ldquo;placeholder&rdquo; socket <em>fd</em> (-1) and a callback function named <code>channel_connect_done()</code>. Remember this callback for
 later on!</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">struct</span> dropbear_progress_connection <span style="color:#f92672">*</span><span style="color:#a6e22e">connect_remote</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> remotehost, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> remoteport,
-	connect_callback cb, <span style="color:#66d9ef">void</span><span style="color:#f92672">*</span> cb_data, 
+	connect_callback cb, <span style="color:#66d9ef">void</span><span style="color:#f92672">*</span> cb_data,
 	<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> bind_address, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> bind_port)
 {
 	<span style="color:#66d9ef">struct</span> dropbear_progress_connection <span style="color:#f92672">*</span>c <span style="color:#f92672">=</span> NULL;
@@ -368,7 +368,7 @@ This is where the socket is practically connected to the remote host.</p>
 		}
                 ...
 	}
-	...	
+	...
 }
 </code></pre></div><p><strong>Assigning the Socket to the Channel</strong></p>
 <p>The status of the connection to the remote host is checked in <code>handle_connect_fds</code>, also from the session loop.
@@ -378,7 +378,7 @@ This is where, if the connection succeeded, its callback is invoked - remember o
 The function sets the socket&rsquo;s <em>fd</em> to be the channel&rsquo;s source of reading
 and the destination of writing. With that, all I/O is done against the remote address.</p>
 <p>Finally, a confirmation message is sent back to the client with the channel identifier.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">channel_connect_done</span>(<span style="color:#66d9ef">int</span> result, <span style="color:#66d9ef">int</span> sock, <span style="color:#66d9ef">void</span><span style="color:#f92672">*</span> user_data, 
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">channel_connect_done</span>(<span style="color:#66d9ef">int</span> result, <span style="color:#66d9ef">int</span> sock, <span style="color:#66d9ef">void</span><span style="color:#f92672">*</span> user_data,
                           <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> UNUSED(errstring)) {
 
 	<span style="color:#66d9ef">struct</span> Channel <span style="color:#f92672">*</span>channel <span style="color:#f92672">=</span> user_data;
@@ -408,7 +408,7 @@ and get the answers.</p>
 
     </div>
     <div class="post-footer">
-      
+
     </div>
   </article>
   <script>
@@ -434,10 +434,10 @@ and get the answers.</p>
 "cutest word":"You've never written a cooler commit message than the one I just wrote and which contained the word 'cronjobable'",
 "typedef":"This short post on C typedef and const is the cutest thing I read today. I just love C peculiarities :)",
 "assembly":"TIL that shift instructions store the pushed bits into the carry flag. This allows, for example, to efficiently check the parity of a number before it's shifted right by one bit; if it was an odd number, the carry flag will be set and we can branch accordingly with, say, JNC.",
-"hardware":"I just broke an SSD nand chip. Honestly, I can't believe this tiny piece of material stores data. Hardware adventures with @ace__pace", 
+"hardware":"I just broke an SSD nand chip. Honestly, I can't believe this tiny piece of material stores data. Hardware adventures with @ace__pace",
 "switch":"TIL how switch statements are handled by the compiler (well, one way). The compiler generates a table of value-label pairs - possible values the expression we 'switch on' can take, and labels to jump to, accordingly. [1/3] @Dafna_Mordechai",
 "assignment":"TIL with @Dafna_Mordechai  Crown that (a=b)=c compiles in C++ but not in C. That's because in C, a=b returns the value of b (which can't be assigned anything), whereas in C++, a=b returns a reference to a (an 'l-value') - which can be used in the second assignment. #trivia",
-"WiFi on a plane":"The most important URL I will ever memorize is http://msftconnect.com. This way, even if my stupid phone doesn't auto-launch the browser to connect to the WiFi, I can open it myself.",
+"WiFi on a plane":"The most important URL I will ever memorize is https//msftconnect.com. This way, even if my stupid phone doesn't auto-launch the browser to connect to the WiFi, I can open it myself.",
 "phrasing":"Nothing demotivates me more than a badly-phrased research question. I find it extremely important to state my tasks in a clear, non-ambiguous way.",
 "layout":"Sometimes, quite weirdly, the layout has tremendous effect. I once had a task-list on Google docs which felt *completely different* and more thrilling once converted into a Google sheet. I can't explain it, that's just what it was :)",
 "crucial":"#NoteToSelf If something works and you're just too happy to write down what you did to make it work - write down what you did to make it work.",
@@ -477,7 +477,7 @@ and get the answers.</p>
 "useless GIFs":"I totally just created a gif that will serve myself and my study-partner and no one else. Oh well",
 "talking":"'Life begins at the end of your comfort zone'. Giving talks in public conferences is scary, but it's a major career progress. Yesterday, 40 @Baot_IL members wrote their first abstracts and I was there to witness. Will 2020 have more tech female speakers on stage? Yes, I think so.",
 "drinking":"Conversations at @Guardicore be like",
-"buddies":"This is exactly how this week should end. Mixin it at @Guardicore", 
+"buddies":"This is exactly how this week should end. Mixin it at @Guardicore",
 "tempt":"Romantic is when your TL invites you to a binary exploitation remote session. @liadmord #JustKidding #WeAreBothKindaMarried",
 "obsessed":"I feel lucky to have friends who are as obsessive as I am with finding answers to the most non-critical questions. Friends who are so eager to reach a solution, they send me WhatsApp messages because I haven't replied on Slack for 45 seconds. yes @liadmord  I'm talking about you",
 "stubborn":"I love how with @MatalonMor we can solve a CTF challenge in 2.5 minutes but then spend another 3 hours on understanding to the bit level why the integer overflow was triggered in the first place. Aaaaahhhh satisfaction",
@@ -487,7 +487,7 @@ and get the answers.</p>
 "Golang":"Twitter produces fun and spontaneous tech collaborations",
 "Rust":"This tweet came just in time and put a big, big smile on my face. Python, Golang, Rust, Kotlin, what's next?",
 "Kotlin":"My dear boyfriend @IddoYadlin had an idea that we both develop HexDec for #Android. Well, he ended up doing this by himself, asking me for only graphics... So I guess HexDec now has implementations in 4 languages and an actual GUI. Sweeeeet. Link to source is in the thread.",
-"wrote up":"Really glad to see new content created around http://begin.re with more up-to-date tools ;)",
+"wrote up":"Really glad to see new content created around https//begin.re with more up-to-date tools ;)",
 "begin.re":"",
 "stared":"I think I'm being dumbstruck by C's switch-case construct in this very moment.",
 "ask out loud":"In case you wonder, this prints 'Case 1'. Anyone has a decent explanation? :(",
