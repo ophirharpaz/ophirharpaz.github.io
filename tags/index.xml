@@ -2,12 +2,12 @@
 <rss version="2.0" xmlns:atom="https//www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Ophir Harpaz&#39;s Blog</title>
-    <link>https://ophirharpaz.github.io/tags/</link>
+    <link>https://ophirharpaz.com/tags/</link>
     <description>Recent content in Tags on Ophir Harpaz&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
 
-	<atom:link href="https://ophirharpaz.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ophirharpaz.com/tags/index.xml" rel="self" type="application/rss+xml" />
 
 
   </channel>
