@@ -6,9 +6,18 @@
     <description>Recent content on Ophir Harpaz&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 30 Dec 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 14 Oct 2026 00:00:00 +0000</lastBuildDate>
 
 	<atom:link href="https://ophirharpaz.com/index.xml" rel="self" type="application/rss+xml" />
+<!-- post:unslopping-ai -->
+    <item>
+      <title>Unslopping AI in Plaintext</title>
+      <link>https://ophirharpaz.com/posts/unslopping-ai/</link>
+      <pubDate>Wed, 14 Oct 2026 00:00:00 +0000</pubDate>
+      <guid>https://ophirharpaz.com/posts/unslopping-ai/</guid>
+      <description>A couple of days ago I saw a reference to an interesting piece of research from Meta AI about &quot;Unslopping AI&quot;. After reading it, I came to the unavoidable conclusion that the blog reads a lot like AI slop. (For those who are interested, I&#x27;ll leave some supporting evidence at the end of this post.) As a recently established slop warrior, I went on to decipher the blog and understand</description>
+    </item>
+<!-- /post:unslopping-ai -->
 
 
     <item>
