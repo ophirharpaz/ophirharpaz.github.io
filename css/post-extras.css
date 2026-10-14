@@ -1,0 +1,53 @@
+/* Extra post styles not covered by the m10c theme. Colors come from the theme:
+   page #353b43, sidebar #242930, text #afbac4, accent #57cc8a. */
+
+.post-content blockquote {
+  margin: 1.5em 0;
+  padding: 0.9em 1.25em;
+  background: #2c3138;
+  border-left: 3px solid #57cc8a;
+  border-radius: 0 6px 6px 0;
+  color: #d3dae0;
+  font-style: italic;
+}
+
+.post-content blockquote p {
+  margin: 0;
+}
+
+.post-content blockquote p + p {
+  margin-top: 0.75em;
+}
+
+.post-content li > blockquote {
+  margin: 0.5em 0 0.75em;
+}
+
+.post-content table {
+  width: 100%;
+  margin: 1.5em 0;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.post-content th,
+.post-content td {
+  padding: 0.6em 1em;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(175, 186, 196, 0.15);
+}
+
+.post-content th {
+  color: #fff;
+  border-bottom: 2px solid #57cc8a;
+}
+
+.post-content td:first-child {
+  color: #fff;
+  white-space: nowrap;
+}
+
+.post-content tbody tr:hover {
+  background: rgba(175, 186, 196, 0.05);
+}
