@@ -15,15 +15,15 @@
     <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://ophirharpaz.com/images/slop_image_00.png"/>
 <meta name="twitter:title" content="Unslopping AI in Plaintext"/>
-<meta name="twitter:description" content="A couple of days ago I saw a reference to an interesting piece of research from Meta AI about &quot;Unslopping AI&quot;. After reading it, I came to the unavoidable conclusion that the blog reads a lot like AI slop. (For those who are interested, I&#x27;ll leave some supporting evidence at the end of this post.) As a recently established slop warrior, I went on to decipher the blog and understand"/>
+<meta name="twitter:description" content="A couple of days ago I saw a reference to an interesting piece of research from Meta AI about &quot;Unslopping AI&quot;. After reading it, my gut feeling was that the blog reads a lot like AI slop. (I can&#x27;t say this with 100% confidence, and one of my reviewers was skeptical, but I&#x27;ll let you judge for yourself.) As a recently established slop warrior, I went on to decipher the"/>
 
     <meta property="og:title" content="Unslopping AI in Plaintext" />
-<meta property="og:description" content="A couple of days ago I saw a reference to an interesting piece of research from Meta AI about &quot;Unslopping AI&quot;. After reading it, I came to the unavoidable conclusion that the blog reads a lot like AI slop. (For those who are interested, I&#x27;ll leave some supporting evidence at the end of this post.) As a recently established slop warrior, I went on to decipher the blog and understand" />
+<meta property="og:description" content="A couple of days ago I saw a reference to an interesting piece of research from Meta AI about &quot;Unslopping AI&quot;. After reading it, my gut feeling was that the blog reads a lot like AI slop. (I can&#x27;t say this with 100% confidence, and one of my reviewers was skeptical, but I&#x27;ll let you judge for yourself.) As a recently established slop warrior, I went on to decipher the" />
 <meta property="og:image" content="https://ophirharpaz.com/images/slop_image_00.png" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://ophirharpaz.com/posts/unslopping-ai/" />
-<meta property="article:published_time" content="2026-10-14T00:00:00+00:00" />
-<meta property="article:modified_time" content="2026-10-14T00:00:00+00:00" />
+<meta property="article:published_time" content="2026-10-15T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-10-15T00:00:00+00:00" />
 
 
   </head>
@@ -62,7 +62,7 @@
   <title>calendar</title>
   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
 </svg>
-          Oct 14, 2026
+          Oct 15, 2026
         </div>
         <div>
           <svg xmlns="https//www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
@@ -73,26 +73,25 @@
         </div></div>
     </header>
     <div class="post-content">
-      <p>A couple of days ago I saw a reference to an interesting piece of <a href="https://facebookresearch.github.io/RAM/blogs/unslop">research</a> from Meta AI about "Unslopping AI". After reading it, I came to the unavoidable conclusion that the blog reads a lot like AI slop. (For those who are interested, I'll leave some supporting evidence at the end of this post.) As a recently established slop warrior, I went on to decipher the blog and understand how people try to make AI outputs more readable. </p>
+      <p>A couple of days ago I saw a reference to an interesting piece of <a href="https://facebookresearch.github.io/RAM/blogs/unslop">research</a> from Meta AI about "Unslopping AI". After reading it, my gut feeling was that the blog reads a lot like AI slop. (I can't say this with 100% confidence, and one of my reviewers was skeptical, but I'll let you judge for yourself.) As a recently established slop warrior, I went on to decipher the blog and understand how people try to make AI outputs more readable. </p>
 <p>This post is meant to be: </p>
 <ol>
 <li>a less academic and hopefully a more fun-to-read version of the original blog post;</li>
 <li>a place to share my own critique of the researchers' assumptions and approach. </li>
 </ol>
 <p>I will dedicate most of my time and space to the methodology and not the results. Also, if you're interested in the bits and bytes of the experiments, you should definitely read the original source. You're welcome to discuss it with me on <a href="https://x.com/OphirHarpaz">X</a>.</p>
-<h1 id="the-problem">The problem</h1>
-<p>First, the problem: AI slop is real. AIs are machines that choose the most probable next token based on what they've seen so far as input. They're trained on mediocre texts, and thus produce mediocre texts (I claim their generations are worse than mediocre, but that's a matter of taste). In practice (and this is a popular opinion), AIs write in a way that's exhausting to read, difficult to understand and does not resemble how humans interact. </p>
+<h2 id="the-problem">The problem</h2>
+<p>First, the problem: AI slop is real. Put in a very simplified way, AIs are machines that choose the most probable next token based on what they've seen so far as input. If they're trained on mediocre texts, they tend to produce mediocre texts (I claim their generations are worse than mediocre, but that's a matter of taste). In practice (and this is a popular opinion), AIs write in a way that's exhausting to read, difficult to understand and does not resemble how humans interact.</p>
 <p>Another problem is that good writing isn't a verifiable task: writing a Python function which multiplies two integers has a simple correctness test. But there's no test that passes/fails based on the mere quality of an input text.</p>
 <p>If no such test exists, then we should use humans for scoring (<a href="https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback">RLHF</a>), right? The issue with this approach is that the text will only get as good as what the grader (also called annotator) thinks is good, and graders who can discern excellent writing from mediocre aren't scalable.</p>
-<h1 id="solution-tldr">Solution TL;DR</h1>
+<h2 id="solution-tldr">Solution TL;DR</h2>
 <p>Their basic idea was to replace expert annotators with an LLM that is just as good, because the latter <em>is</em> scalable.</p>
 <p>The solution at a high level:</p>
 <ul>
-<li>First, train LLM judges to be really good at judging*, i.e. grade excellent human writing higher than usual AI-generated text</li>
+<li>First, train LLM judges to be really good at judging<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>, i.e. grade excellent human writing higher than usual AI-generated text</li>
 <li>Then use these judges' scoring system - their "rubrics" - to train writer LLMs in reinforcement learning.</li>
 </ul>
-<p>*"train LLM judges" isn't very accurate here, because what gets improved is their rubrics (the "checklists" with which they assess) and not the models.</p>
-<h1 id="starting-point-what-do-llms-prefer">Starting point: what do LLMs prefer?</h1>
+<h2 id="starting-point-what-do-llms-prefer">Starting point: what do LLMs prefer?</h2>
 <p>The authors wanted to first find out how LLMs judge, before they're tuned against a certain rubric. They took an academic paper from which they dropped a section. Then they made an LLM writer complete the missing section. Finally they gave both - the original section and the new AI-written one - as competitors to an LLM judge.</p>
 <p>There are two scoring approaches in this scenario:</p>
 <ol>
@@ -104,13 +103,13 @@
 <p>Claude Opus-4.8 and GPT Sol-5.6 were used in both roles - judge and writer.</p>
 <p>The result: AI judges preferred AI writing (see diagram).</p>
 <p><img alt="LLM judges prefer LLM authors" src="/images/slop_image_00.png" /></p>
-<h1 id="the-two-phase-process">The two-phase process</h1>
+<h2 id="the-two-phase-process">The two-phase process</h2>
 <p>The authors' approach to getting AI to write better is divided into two phases:</p>
 <ol>
 <li><strong>Obtaining rubrics</strong>, i.e. learn how to generate, per test case, a rubric that will favor expert writing over model writing.</li>
 <li><strong>Training models with RL using the rubrics</strong>.</li>
 </ol>
-<h2 id="obtaining-rubrics">Obtaining rubrics</h2>
+<h3 id="obtaining-rubrics">Obtaining rubrics</h3>
 <p>This phase (which the authors called eXpert Aligned Rubrics, or XAR) consists of the following steps:</p>
 <ol>
 <li>Collect samples of well-above-average human writing - academic papers, novels of award-winning authors and Wikipedia entries. Split each sample into <strong>context</strong> (the text minus a part of it) and <strong>continuation</strong> (the omitted part).</li>
@@ -145,14 +144,13 @@
 </table>
 <p>Let's double click on (3). </p>
 <ul>
-<li>We start with a prompt** that says something like "here's a paper with a missing part <code>P</code>. create a list of parameters that estimate how well <code>P</code> is written". </li>
+<li>We start with a prompt<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup> that says something like "here's a paper with a missing part <code>P</code>. create a list of parameters that estimate how well <code>P</code> is written". </li>
 <li>A rubric is created in response to this prompt. </li>
 <li>An LLM judge then uses the rubric to score each of the two candidates. The "human-model gap" is simply <code>score(human)-score(model)</code>.</li>
 <li>A "refinement" loop runs several times, each time modifying the prompt, aiming to maximize the human-model gap (that is, make the judge strongly favor the human-written candidate).</li>
 </ul>
-<p>**They call it a meta-prompt, which I take as "a prompt general enough to create rubrics for multiple cases".</p>
 <p>To make a long story short, this method seems to work: the learnt rubrics push the judge from the AI side to the human side.</p>
-<h2 id="training-models-to-write-well">Training models to write well</h2>
+<h3 id="training-models-to-write-well">Training models to write well</h3>
 <p>This part (which the authors call Reinforcement Learning with eXpert Aligned Rubrics, or RL-XAR) performs the following steps iteratively:</p>
 <ol>
 <li>Learn optimal rubrics (optimal meaning "highly favoring expert-quality writing").</li>
@@ -162,7 +160,7 @@
 <p>This process is done for all three categories - computer science papers, novels from award-winning authors and high-quality Wiki pages.</p>
 <p>I'm omitting the details about how many iterations they ran, how many were used for training vs. evaluation and how they eventually scored the trained writer model.</p>
 <p>For the academic papers experiment, they show that a Qwen3.5-27B trained with RL-XAR performs better than frontier models (Opus 5.5, GPT-5.6). In the end, they let <em>the original paper's author</em> decide between the continuation of the baseline model and that of the RL-XAR-trained one. The latter won 16:2.</p>
-<h2 id="putting-model-use-in-order">Putting model use in order</h2>
+<h3 id="putting-model-use-in-order">Putting model use in order</h3>
 <p>Models in the process take the following roles:</p>
 <ul>
 <li>Rubric generator: a model that takes a meta-prompt and outputs a rubric for a certain context (i.e. missing text)</li>
@@ -174,20 +172,21 @@
 </li>
 <li>Writer</li>
 </ul>
-<h1 id="what-optimal-rubrics-valued">What optimal rubrics valued</h1>
+<h2 id="what-optimal-rubrics-valued">What optimal rubrics valued</h2>
 <p>Initial rubrics favored new paragraphs which covered substantial parts of the whole paper, repeated claims, methods, and results. The learnt rubrics (optimized ones) valued conciseness, focus on current topic and relevance.</p>
 <p>Now take a look at this quote from the research blog and tell me a human wrote it (I mean, 99% of the texts that contain "prose" are AI slop):</p>
 <blockquote>
 <p>Over the iterations the optimizer rewrites the guidance that mis-scores expert prose: docking the human for principled omissions, crediting a compressed summary as fluency, and mistaking surface polish for craft. The learned rubrics thus also tend to reward sectional ownership (i.e., not a miniature of the whole paper), disciplined selection, economy, and precise on-scope detail rather than breadth of coverage.</p>
 </blockquote>
 <p>Definitely comprehensible. If you read it 28 times.</p>
-<h1 id="my-personal-thoughts">My personal thoughts</h1>
-<h2 id="human-graders-can-be-just-humans">Human graders can be just humans</h2>
-<p>One of the claims undermining the use of RLHF is that "excellent annotators don't scale", namely that it's impossible (or costly) to get many human graders who can truly distinguish expert writing from mediocre writing. I claim we don't need experts. We need... AI users. Every one of them can recognize AI slop from a distance. Don't ask them "which answer is better?" This brought us to where we are today. Ask them "which answer reads like slop?"</p>
-<p>Penalizing slop won't make AI write like a Nobel-winning writer. But it might make it write like a normal person, and honestly, that's all I'm asking for.</p>
-<h2 id="academic-papers-dont-necessarily-represent-good-writing">Academic papers don't necessarily represent "good writing"</h2>
-<p>We don't need AI to write as well as a CS professor. Personally, I don't even perceive academic papers as state-of-the-art writing. I even sometimes feel that model responses <em>resemble</em> the style of a tough academic paper. Perhaps what we need is the language found in beginner-friendly writeups, recipe blogs, or other resources which are inherently easy and flowy to read.</p>
-<h2 id="a-blog-post-about-unslopping-ai-should-unslop-itself">A blog post about unslopping AI should unslop itself</h2>
+<h2 id="my-personal-thoughts">My personal thoughts</h2>
+<h3 id="human-graders-can-be-just-humans">Human graders can be just humans</h3>
+<p>One of the claims undermining the use of RLHF is that "excellent annotators don't scale", namely that it's impossible (or costly) to get many human graders who can truly distinguish expert writing from mediocre writing.</p>
+<p>I claim we don't need experts. We need... AI users. Every one of them can recognize AI slop from a distance. Don't ask them "which answer is better?" This brought us to where we are today. Ask them "which answer reads like slop?" More practically, train a model to predict the slop score a human would assign to a given output. Then use that model as a grader during RLHF.</p>
+<p>Penalizing slop won't make AI write like a Nobel-winning writer. But it might make it write like a normal person, and that's all I'm asking for.</p>
+<h3 id="academic-papers-dont-necessarily-represent-good-writing">Academic papers don't necessarily represent "good writing"</h3>
+<p>We don't need AI to write as well as a CS professor. Personally, I don't even perceive academic papers as state-of-the-art writing. I even sometimes feel that model responses <em>resemble</em> the style of a tough academic paper. Perhaps what we need is more of a context-dependent writing style - sometimes formal and technical, sometimes casual, depending on the need expressed in (or deduced from) the prompt.</p>
+<h3 id="a-blog-post-about-unslopping-ai-should-unslop-itself">A blog post about unslopping AI should unslop itself</h3>
 <p>Two more examples, apart from the one I highlighted earlier:</p>
 <ol>
 <li>
@@ -203,6 +202,19 @@
 <p>Come on. You need a GPU instead of a brain for this stuff.</p>
 </li>
 </ol>
+<p>If no AI was involved in the writing of the Meta AI blog post, then I'm deeply sorry and I'll go back to being resentful about academic language.</p>
+<p>Many thanks to <a href="https://x.com/GekkerGil">Gil Gekker</a>, <a href="https://il.linkedin.com/in/zvika-ben-haim-b2692a6">Zvika Ben-Haim</a> and <a href="https://www.linkedin.com/in/adir-kobovich-004494233/">Adir Kobovich</a> for reading and giving feedback.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>"train LLM judges" isn't very accurate here, because what gets improved is their rubrics (the "checklists" with which they assess) and not the models.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>They call it a meta-prompt, which is likely a prompt that outputs prompts. But I find it easy to think of it as "a prompt general enough to create rubrics for multiple cases".&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
     </div>
   </article>
   <script>
