@@ -147,7 +147,7 @@
 <li>We start with a prompt<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup> that says something like "here's a paper with a missing part <code>P</code>. create a list of parameters that estimate how well <code>P</code> is written". </li>
 <li>A rubric is created in response to this prompt. </li>
 <li>An LLM judge then uses the rubric to score each of the two candidates. The "human-model gap" is simply <code>score(human)-score(model)</code>.</li>
-<li>A "refinement" loop runs several times, each time modifying the prompt, aiming to maximize the human-model gap (that is, make the judge strongly favor the human-written candidate).</li>
+<li>An optimization loop runs several times, each time modifying the prompt, aiming to maximize the human-model gap (that is, make the judge strongly favor the human-written candidate).</li>
 </ul>
 <p>To make a long story short, this method seems to work: the learnt rubrics push the judge from the AI side to the human side.</p>
 <h3 id="training-models-to-write-well">Training models to write well</h3>
